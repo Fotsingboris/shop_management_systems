@@ -13,8 +13,11 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from pathlib import Path
 
+from decouple import config
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
 
 
 # Quick-start development settings - unsuitable for production
@@ -66,7 +69,7 @@ TEMPLATES = [
             'context_processors': [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages', 
+                'django.contrib.messages.context_processors.messages',
                 "general.context_processors.parametres_entreprise",
             ],
         },
@@ -133,3 +136,115 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# =============================================================================
+# NOUVEAU — Cache (Redis)
+# =============================================================================
+# general.models.ParametresEntreprise (EF-13.2) utilise déjà django.core.cache.
+# Sans CACHES explicite, Django retombe sur LocMemCache, qui est PAR PROCESSUS
+# : avec plusieurs workers gunicorn/uwsgi, chacun aurait son propre cache non
+# synchronisé, et l'invalidation sur save() ne serait vue que par un seul
+# worker. Redis règle ce problème en partageant un cache unique entre tous les
+# processus. DB 2 du même Redis que Celery (DB 0/1), pour ne pas multiplier
+# les instances.
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": config("REDIS_CACHE_URL", "redis://127.0.0.1:6379/2"),
+    }
+}
+
+
+# =============================================================================
+# NOUVEAU — Celery / Redis (broker + backend de résultats)
+# =============================================================================
+CELERY_BROKER_URL = config("CELERY_BROKER_URL", "redis://127.0.0.1:6379/0")
+CELERY_RESULT_BACKEND = config("CELERY_RESULT_BACKEND", "redis://127.0.0.1:6379/1")
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60  # 30 min ; ajuster selon la durée réelle de vos tâches
+CELERY_RESULT_EXTENDED = True
+
+
+# =============================================================================
+# NOUVEAU — Logging
+# =============================================================================
+LOG_DIR = BASE_DIR / "logs"
+LOG_DIR.mkdir(exist_ok=True)
+
+DJANGO_LOG_LEVEL = config("DJANGO_LOG_LEVEL", "DEBUG" if DEBUG else "INFO")
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "%(asctime)s [%(levelname)s] %(name)s %(module)s.%(funcName)s:%(lineno)d - %(message)s",
+        },
+        "simple": {
+            "format": "%(asctime)s [%(levelname)s] %(name)s - %(message)s",
+        },
+    },
+    "handlers": {
+        "console": {
+            "level": DJANGO_LOG_LEVEL,
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
+        },
+        "file": {
+            "level": "INFO",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": LOG_DIR / "django.log",
+            "maxBytes": 10 * 1024 * 1024,  # 10 Mo
+            "backupCount": 5,
+            "formatter": "verbose",
+        },
+        "file_errors": {
+            "level": "ERROR",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": LOG_DIR / "errors.log",
+            "maxBytes": 10 * 1024 * 1024,
+            "backupCount": 5,
+            "formatter": "verbose",
+        },
+    },
+    "root": {
+        "handlers": ["console", "file"],
+        "level": "INFO",
+    },
+    "loggers": {
+        # Logs internes de Django (requêtes, dépréciations...).
+        "django": {
+            "handlers": ["console", "file"],
+            "level": DJANGO_LOG_LEVEL,
+            "propagate": False,
+        },
+        # Erreurs serveur (500) : toujours loguées, même si DJANGO_LOG_LEVEL
+        # est monté à WARNING/ERROR en production.
+        "django.request": {
+            "handlers": ["console", "file_errors"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+        # Logs des workers Celery.
+        "celery": {
+            "handlers": ["console", "file"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        # Logger applicatif commun aux 4 apps du projet. Dans le code :
+        #   import logging
+        #   logger = logging.getLogger("shop.sales")   # ou "shop.products", etc.
+        # Ces loggers enfants n'ont pas besoin d'être déclarés ici : ils
+        # héritent automatiquement des handlers de "shop" par propagation.
+        "shop": {
+            "handlers": ["console", "file"],
+            "level": DJANGO_LOG_LEVEL,
+            "propagate": False,
+        },
+    },
+}
