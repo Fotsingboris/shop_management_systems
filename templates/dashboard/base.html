@@ -1,0 +1,40 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  {% include 'dashboard/include/_mata.html' %}
+  {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-gray-50 antialiased">
+
+  <!-- Mobile backdrop -->
+  <div id="backdrop" class="fixed inset-0 z-30 hidden bg-gray-900/50 lg:hidden"></div>
+
+  <div class="flex min-h-screen">
+
+    <!-- Sidebar -->
+    {% include 'dashboard/include/_sidebar.html' %}
+    
+
+    <!-- Content column -->
+    <div class="flex min-h-screen w-full flex-col">
+
+      <!-- Header -->
+      {% include 'dashboard/include/_header.html' %}
+      
+
+      <!-- Main content -->
+      <main class="flex-1 px-4 py-6 sm:px-6 lg:px-8">
+        {% block content %}{% endblock %}
+      </main>
+
+      <!-- Footer -->
+      {% include 'dashboard/include/_footer.html' %}
+      
+    </div>
+  </div>
+
+  {% include 'dashboard/include/_js.html' %}
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

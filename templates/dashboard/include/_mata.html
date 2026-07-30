@@ -1,0 +1,20 @@
+{% load static %}
+
+<meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Tableau de bord{% endblock %} — Shop Management System</title>
+  <link rel="stylesheet" href="{% static 'css/output.css' %}">
+  
+<style>
+    :root { --sidebar-w: 16rem; }
+    .sidebar-collapsed { --sidebar-w: 5rem; }
+    #sidebar { transform: translateX(-100%); }
+    #sidebar.sidebar-open { transform: translateX(0); }
+    @media (min-width: 1024px) {
+      #sidebar { transform: translateX(0) !important; }
+    }
+    .sidebar-collapsed .nav-label,
+    .sidebar-collapsed .brand-label,
+    .sidebar-collapsed .nav-group-label { display: none; }
+    .sidebar-collapsed .nav-link { justify-content: center; }
+  </style>

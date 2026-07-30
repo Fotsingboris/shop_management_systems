@@ -1,0 +1,61 @@
+{% load static %}
+
+<script>
+    (function () {
+      var root = document.documentElement;
+      var sidebar = document.getElementById('sidebar');
+      var backdrop = document.getElementById('backdrop');
+      var mobileMenuBtn = document.getElementById('mobileMenuBtn');
+      var collapseToggle = document.getElementById('collapseToggle');
+      var collapseIcon = document.getElementById('collapseIcon');
+      var userMenuBtn = document.getElementById('userMenuBtn');
+      var userMenu = document.getElementById('userMenu');
+
+      function openMobileSidebar() {
+        sidebar.classList.add('sidebar-open');
+        backdrop.classList.remove('hidden');
+        mobileMenuBtn.setAttribute('aria-expanded', 'true');
+        document.body.classList.add('overflow-hidden');
+      }
+      function closeMobileSidebar() {
+        sidebar.classList.remove('sidebar-open');
+        backdrop.classList.add('hidden');
+        mobileMenuBtn.setAttribute('aria-expanded', 'false');
+        document.body.classList.remove('overflow-hidden');
+      }
+      mobileMenuBtn.addEventListener('click', function () {
+        var isOpen = sidebar.classList.contains('sidebar-open');
+        isOpen ? closeMobileSidebar() : openMobileSidebar();
+      });
+      backdrop.addEventListener('click', closeMobileSidebar);
+
+      var collapsed = localStorage.getItem('sidebar-collapsed') === 'true';
+      if (collapsed) {
+        root.classList.add('sidebar-collapsed');
+        collapseIcon.style.transform = 'rotate(180deg)';
+      }
+      collapseToggle.addEventListener('click', function () {
+        collapsed = !collapsed;
+        root.classList.toggle('sidebar-collapsed', collapsed);
+        collapseIcon.style.transform = collapsed ? 'rotate(180deg)' : 'rotate(0deg)';
+        localStorage.setItem('sidebar-collapsed', collapsed);
+      });
+
+      userMenuBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var isHidden = userMenu.classList.contains('hidden');
+        userMenu.classList.toggle('hidden', !isHidden);
+        userMenuBtn.setAttribute('aria-expanded', String(isHidden));
+      });
+      document.addEventListener('click', function (e) {
+        if (!userMenu.classList.contains('hidden') && !userMenu.contains(e.target)) {
+          userMenu.classList.add('hidden');
+          userMenuBtn.setAttribute('aria-expanded', 'false');
+        }
+      });
+
+      window.matchMedia('(min-width: 1024px)').addEventListener('change', function (e) {
+        if (e.matches) closeMobileSidebar();
+      });
+    })();
+  </script>
