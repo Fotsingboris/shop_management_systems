@@ -1,0 +1,246 @@
+<svg viewBox="0 0 1980 1850" xmlns="http://www.w3.org/2000/svg" role="img" font-family="Arial, sans-serif">
+<title>Diagramme de classes — Système de Gestion de Boutique (v2, avec Client)</title>
+<desc>Diagramme de classes UML avec BaseModel, hiérarchie Utilisateur/Admin/ResponsableAgence/Caissier, classes du domaine (Agence, Categorie, Produit, ProduitAgence, TransfertStock, Client, Commande, LigneCommande, Recu, ParametresEntreprise) et leurs associations. Client est optionnel sur Commande.</desc>
+
+<defs>
+  <marker id="gen" viewBox="0 0 20 16" refX="19" refY="8" markerWidth="18" markerHeight="15" orient="auto-start-reverse">
+    <path d="M1,1 L19,8 L1,15 Z" fill="#fff" stroke="#111" stroke-width="1.3"/>
+  </marker>
+</defs>
+
+<g>
+  <rect x="560" y="40" width="260" height="104" fill="#eef2f7" stroke="#555" stroke-width="1.5"/>
+  <text x="690" y="58" text-anchor="middle" font-size="12" font-style="italic" fill="#555">«abstract»</text>
+  <text x="690" y="76" text-anchor="middle" font-size="15" font-weight="700" fill="#111">BaseModel</text>
+  <line x1="560" y1="84" x2="820" y2="84" stroke="#555"/>
+  <text x="572" y="100" font-size="12.5" fill="#111">id : UUID</text>
+  <text x="572" y="118" font-size="12.5" fill="#111">created_at : DateTime</text>
+  <text x="572" y="136" font-size="12.5" fill="#111">updated_at : DateTime</text>
+</g>
+
+<g>
+  <path d="M860 40 H1240 V130 H900 L860 115 Z" fill="#fafafa" stroke="#999" stroke-dasharray="4,3" stroke-width="1.3"/>
+  <text x="1050" y="65" text-anchor="middle" font-size="12.5" fill="#555">Toutes les classes du domaine ci-dessous</text>
+  <text x="1050" y="83" text-anchor="middle" font-size="12.5" fill="#555">héritent de BaseModel (id, created_at,</text>
+  <text x="1050" y="101" text-anchor="middle" font-size="12.5" fill="#555">updated_at) — non répété sur chaque classe.</text>
+  <line x1="860" y1="90" x2="820" y2="90" stroke="#999" stroke-dasharray="4,3"/>
+</g>
+
+<g>
+  <rect x="1040" y="220" width="260" height="70" fill="#fafafa" stroke="#999" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="1170" y="238" text-anchor="middle" font-size="12" font-style="italic" fill="#555">«django»</text>
+  <text x="1170" y="256" text-anchor="middle" font-size="14" font-weight="700" fill="#111">AbstractUser</text>
+  <line x1="1040" y1="264" x2="1300" y2="264" stroke="#999" stroke-dasharray="5,3"/>
+  <text x="1052" y="280" font-size="12" fill="#555">username, email, password…</text>
+</g>
+
+<g>
+  <rect x="1030" y="340" width="280" height="100" fill="#eef2f7" stroke="#555" stroke-width="1.5"/>
+  <text x="1170" y="360" text-anchor="middle" font-size="15" font-weight="700" fill="#111">Utilisateur</text>
+  <line x1="1030" y1="368" x2="1310" y2="368" stroke="#555"/>
+  <text x="1042" y="386" font-size="12.5" fill="#111">agence : Agence</text>
+  <text x="1042" y="404" font-size="12.5" fill="#111">telephone : str</text>
+  <text x="1042" y="422" font-size="12.5" fill="#111">rôle : str (choix)</text>
+</g>
+
+<line x1="1170" y1="340" x2="1170" y2="290" stroke="#111" stroke-width="1.5" marker-end="url(#gen)"/>
+<line x1="1030" y1="360" x2="820" y2="150" stroke="#111" stroke-width="1.5" marker-end="url(#gen)"/>
+
+<g>
+  <rect x="880" y="560" width="200" height="64" fill="#eef2f7" stroke="#555" stroke-width="1.5"/>
+  <text x="980" y="580" text-anchor="middle" font-size="14" font-weight="700" fill="#111">Admin</text>
+  <line x1="880" y1="588" x2="1080" y2="588" stroke="#555"/>
+  <text x="892" y="606" font-size="11.5" fill="#555">portée : toutes agences</text>
+</g>
+<g>
+  <rect x="1100" y="560" width="230" height="64" fill="#eef2f7" stroke="#555" stroke-width="1.5"/>
+  <text x="1215" y="580" text-anchor="middle" font-size="14" font-weight="700" fill="#111">ResponsableAgence</text>
+  <line x1="1100" y1="588" x2="1330" y2="588" stroke="#555"/>
+  <text x="1112" y="606" font-size="11.5" fill="#555">portée : son agence</text>
+</g>
+<g>
+  <rect x="1350" y="560" width="190" height="64" fill="#eef2f7" stroke="#555" stroke-width="1.5"/>
+  <text x="1445" y="580" text-anchor="middle" font-size="14" font-weight="700" fill="#111">Caissier</text>
+  <line x1="1350" y1="588" x2="1540" y2="588" stroke="#555"/>
+  <text x="1362" y="606" font-size="11.5" fill="#555">portée : ses ventes</text>
+</g>
+
+<g stroke="#111" stroke-width="1.5" fill="none">
+  <line x1="980" y1="560" x2="980" y2="520"/>
+  <line x1="1215" y1="560" x2="1215" y2="520"/>
+  <line x1="1445" y1="560" x2="1445" y2="520"/>
+  <line x1="980" y1="520" x2="1445" y2="520"/>
+  <line x1="1170" y1="520" x2="1170" y2="440" marker-end="url(#gen)"/>
+</g>
+
+<g>
+  <rect x="1030" y="710" width="280" height="124" fill="#eef2f7" stroke="#555" stroke-width="1.5"/>
+  <text x="1170" y="730" text-anchor="middle" font-size="15" font-weight="700" fill="#111">Agence</text>
+  <line x1="1030" y1="738" x2="1310" y2="738" stroke="#555"/>
+  <text x="1042" y="756" font-size="12.5" fill="#111">nom : str</text>
+  <text x="1042" y="774" font-size="12.5" fill="#111">adresse : str</text>
+  <text x="1042" y="792" font-size="12.5" fill="#111">telephone : str</text>
+  <text x="1042" y="810" font-size="12.5" fill="#111">actif : bool</text>
+</g>
+
+<g stroke="#555" stroke-width="1.5" fill="none">
+  <polyline points="1310,390 1560,390 1560,772 1310,772"/>
+</g>
+<text x="1520" y="384" font-size="11.5" fill="#555">*</text>
+<text x="1320" y="766" font-size="11.5" fill="#555">1</text>
+
+<g>
+  <rect x="1590" y="250" width="300" height="204" fill="#eef2f7" stroke="#555" stroke-width="1.5"/>
+  <text x="1740" y="268" text-anchor="middle" font-size="12" font-style="italic" fill="#555">«singleton»</text>
+  <text x="1740" y="286" text-anchor="middle" font-size="15" font-weight="700" fill="#111">ParametresEntreprise</text>
+  <line x1="1590" y1="294" x2="1890" y2="294" stroke="#555"/>
+  <text x="1602" y="312" font-size="12.5" fill="#111">nom : str</text>
+  <text x="1602" y="330" font-size="12.5" fill="#111">logo : Image</text>
+  <text x="1602" y="348" font-size="12.5" fill="#111">adresse : str</text>
+  <text x="1602" y="366" font-size="12.5" fill="#111">telephone : str</text>
+  <text x="1602" y="384" font-size="12.5" fill="#111">email : str</text>
+  <text x="1602" y="402" font-size="12.5" fill="#111">tax_id : str</text>
+  <text x="1602" y="420" font-size="12.5" fill="#111">devise : str</text>
+  <text x="1602" y="438" font-size="12.5" fill="#111">note_pied_page : str</text>
+</g>
+
+<g>
+  <rect x="80" y="910" width="240" height="144" fill="#eef2f7" stroke="#555" stroke-width="1.5"/>
+  <text x="200" y="930" text-anchor="middle" font-size="15" font-weight="700" fill="#111">Categorie</text>
+  <line x1="80" y1="938" x2="320" y2="938" stroke="#555"/>
+  <text x="92" y="956" font-size="12.5" fill="#111">nom : str</text>
+  <text x="92" y="974" font-size="12.5" fill="#111">slug : str</text>
+  <text x="92" y="992" font-size="12.5" fill="#111">parent : Categorie (0..1)</text>
+  <text x="92" y="1010" font-size="12.5" fill="#111">image : Image</text>
+  <text x="92" y="1028" font-size="12.5" fill="#111">actif : bool</text>
+</g>
+<path d="M150 910 C 170 870 230 870 250 910" fill="none" stroke="#555" stroke-width="1.3"/>
+<text x="200" y="866" text-anchor="middle" font-size="11" fill="#555">0..1 parent / * sous-catégories</text>
+
+<g>
+  <rect x="400" y="930" width="260" height="164" fill="#eef2f7" stroke="#555" stroke-width="1.5"/>
+  <text x="530" y="950" text-anchor="middle" font-size="15" font-weight="700" fill="#111">Produit</text>
+  <line x1="400" y1="958" x2="660" y2="958" stroke="#555"/>
+  <text x="412" y="976" font-size="12.5" fill="#111">nom : str</text>
+  <text x="412" y="994" font-size="12.5" fill="#111">sku : str</text>
+  <text x="412" y="1012" font-size="12.5" fill="#111">categorie : Categorie</text>
+  <text x="412" y="1030" font-size="12.5" fill="#111">unite : str</text>
+  <text x="412" y="1048" font-size="12.5" fill="#111">description : str</text>
+  <text x="412" y="1066" font-size="12.5" fill="#111">actif : bool</text>
+</g>
+
+<line x1="320" y1="982" x2="400" y2="982" stroke="#555" stroke-width="1.5"/>
+<text x="330" y="976" font-size="11.5" fill="#555">1</text>
+<text x="385" y="976" font-size="11.5" fill="#555">*</text>
+
+<g>
+  <rect x="740" y="930" width="280" height="164" fill="#eef2f7" stroke="#555" stroke-width="1.5"/>
+  <text x="880" y="950" text-anchor="middle" font-size="15" font-weight="700" fill="#111">ProduitAgence</text>
+  <line x1="740" y1="958" x2="1020" y2="958" stroke="#555"/>
+  <text x="752" y="976" font-size="12.5" fill="#111">produit : Produit</text>
+  <text x="752" y="994" font-size="12.5" fill="#111">agence : Agence</text>
+  <text x="752" y="1012" font-size="12.5" fill="#111">prix_vente : Decimal</text>
+  <text x="752" y="1030" font-size="12.5" fill="#111">prix_achat : Decimal</text>
+  <text x="752" y="1048" font-size="12.5" fill="#111">stock_quantite : int</text>
+  <text x="752" y="1066" font-size="12.5" fill="#111">seuil_alerte : int</text>
+</g>
+
+<line x1="660" y1="1012" x2="740" y2="1012" stroke="#555" stroke-width="1.5"/>
+<text x="668" y="1006" font-size="11.5" fill="#555">1</text>
+<text x="722" y="1006" font-size="11.5" fill="#555">*</text>
+
+<line x1="1030" y1="834" x2="1020" y2="930" stroke="#555" stroke-width="1.5"/>
+<text x="1032" y="850" font-size="11.5" fill="#555">1</text>
+<text x="990" y="924" font-size="11.5" fill="#555">*</text>
+
+<g>
+  <rect x="740" y="1150" width="320" height="204" fill="#eef2f7" stroke="#555" stroke-width="1.5"/>
+  <text x="900" y="1170" text-anchor="middle" font-size="15" font-weight="700" fill="#111">TransfertStock</text>
+  <line x1="740" y1="1178" x2="1060" y2="1178" stroke="#555"/>
+  <text x="752" y="1196" font-size="12.5" fill="#111">produit : Produit</text>
+  <text x="752" y="1214" font-size="12.5" fill="#111">agence_source : Agence</text>
+  <text x="752" y="1232" font-size="12.5" fill="#111">agence_destination : Agence</text>
+  <text x="752" y="1250" font-size="12.5" fill="#111">quantite : int</text>
+  <text x="752" y="1268" font-size="12.5" fill="#111">statut : str</text>
+  <text x="752" y="1286" font-size="12.5" fill="#111">demande_par : Utilisateur</text>
+  <text x="752" y="1304" font-size="12" fill="#111">approuve_par : Utilisateur (0..1)</text>
+  <text x="752" y="1322" font-size="12.5" fill="#111">date_transfert : DateTime</text>
+</g>
+
+<line x1="530" y1="1094" x2="790" y2="1150" stroke="#555" stroke-width="1.5"/>
+<text x="540" y="1112" font-size="11.5" fill="#555">1</text>
+<text x="770" y="1146" font-size="11.5" fill="#555">*</text>
+
+<polyline points="1170,834 1170,1210 1060,1210" fill="none" stroke="#555" stroke-width="1.5"/>
+<text x="1176" y="850" font-size="11.5" fill="#555">1</text>
+<text x="1066" y="1204" font-size="11" fill="#555">* source</text>
+
+<polyline points="1220,834 1220,1252 1060,1252" fill="none" stroke="#555" stroke-width="1.5"/>
+<text x="1226" y="850" font-size="11.5" fill="#555">1</text>
+<text x="1066" y="1246" font-size="11" fill="#555">* destination</text>
+
+<!-- ============ Client (NOUVEAU) ============ -->
+<g>
+  <rect x="400" y="1370" width="280" height="114" fill="#eef2f7" stroke="#555" stroke-width="1.5"/>
+  <text x="540" y="1390" text-anchor="middle" font-size="15" font-weight="700" fill="#111">Client</text>
+  <line x1="400" y1="1398" x2="680" y2="1398" stroke="#555"/>
+  <text x="412" y="1416" font-size="12.5" fill="#111">nom : str</text>
+  <text x="412" y="1434" font-size="12.5" fill="#111">telephone : str (unique)</text>
+  <text x="412" y="1452" font-size="12.5" fill="#111">email : str (0..1)</text>
+  <text x="412" y="1470" font-size="12.5" fill="#111">adresse : str (0..1)</text>
+</g>
+
+<g>
+  <rect x="80" y="1500" width="260" height="164" fill="#eef2f7" stroke="#555" stroke-width="1.5"/>
+  <text x="210" y="1520" text-anchor="middle" font-size="15" font-weight="700" fill="#111">LigneCommande</text>
+  <line x1="80" y1="1528" x2="340" y2="1528" stroke="#555"/>
+  <text x="92" y="1546" font-size="12.5" fill="#111">commande : Commande</text>
+  <text x="92" y="1564" font-size="12.5" fill="#111">produit : Produit</text>
+  <text x="92" y="1582" font-size="12.5" fill="#111">quantite : int</text>
+  <text x="92" y="1600" font-size="12.5" fill="#111">prix_unitaire : Decimal</text>
+  <text x="92" y="1618" font-size="12.5" fill="#111">sous_total : Decimal</text>
+</g>
+
+<g>
+  <rect x="400" y="1500" width="280" height="200" fill="#eef2f7" stroke="#555" stroke-width="1.5"/>
+  <text x="540" y="1520" text-anchor="middle" font-size="15" font-weight="700" fill="#111">Commande</text>
+  <line x1="400" y1="1528" x2="680" y2="1528" stroke="#555"/>
+  <text x="412" y="1546" font-size="12.5" fill="#111">agence : Agence</text>
+  <text x="412" y="1564" font-size="12.5" fill="#111">caissier : Caissier</text>
+  <text x="412" y="1582" font-size="12.5" fill="#111">remise : Decimal</text>
+  <text x="412" y="1600" font-size="12.5" fill="#111">taxe : Decimal</text>
+  <text x="412" y="1618" font-size="12.5" fill="#111">total : Decimal</text>
+  <text x="412" y="1636" font-size="12.5" fill="#111">mode_paiement : str</text>
+  <text x="412" y="1654" font-size="12.5" fill="#111">statut : str</text>
+  <text x="412" y="1672" font-size="12.5" fill="#111">date : DateTime</text>
+</g>
+
+<line x1="540" y1="1484" x2="540" y2="1500" stroke="#555" stroke-width="1.5"/>
+<text x="502" y="1480" font-size="11.5" fill="#555">0..1</text>
+<text x="552" y="1497" font-size="11.5" fill="#555">*</text>
+
+<g>
+  <rect x="740" y="1500" width="260" height="124" fill="#eef2f7" stroke="#555" stroke-width="1.5"/>
+  <text x="870" y="1520" text-anchor="middle" font-size="15" font-weight="700" fill="#111">Recu</text>
+  <line x1="740" y1="1528" x2="1000" y2="1528" stroke="#555"/>
+  <text x="752" y="1546" font-size="12.5" fill="#111">commande : Commande (1:1)</text>
+  <text x="752" y="1564" font-size="12.5" fill="#111">numero_recu : str</text>
+  <text x="752" y="1582" font-size="12.5" fill="#111">fichier_pdf : File</text>
+  <text x="752" y="1600" font-size="12.5" fill="#111">date_generation : DateTime</text>
+</g>
+
+<line x1="340" y1="1582" x2="400" y2="1582" stroke="#555" stroke-width="1.5"/>
+<text x="348" y="1576" font-size="11.5" fill="#555">*</text>
+<text x="382" y="1576" font-size="11.5" fill="#555">1</text>
+
+<line x1="680" y1="1582" x2="740" y2="1582" stroke="#555" stroke-width="1.5"/>
+<text x="686" y="1576" font-size="11.5" fill="#555">1</text>
+<text x="718" y="1576" font-size="11.5" fill="#555">1</text>
+
+<g>
+  <line x1="80" y1="1780" x2="130" y2="1780" stroke="#111" stroke-width="1.5" marker-end="url(#gen)"/>
+  <text x="140" y="1785" font-size="12.5" fill="#555">Héritage (généralisation)</text>
+  <line x1="380" y1="1780" x2="430" y2="1780" stroke="#555" stroke-width="1.5"/>
+  <text x="440" y="1785" font-size="12.5" fill="#555">Association (1 / * / 0..1)</text>
+</g>
+</svg>

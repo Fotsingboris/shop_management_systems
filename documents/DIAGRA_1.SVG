@@ -1,0 +1,108 @@
+<svg viewBox="0 0 760 1250" xmlns="http://www.w3.org/2000/svg" role="img" font-family="Arial, sans-serif">
+  <title>Diagramme de cas d'utilisation — Système de Gestion de Boutique</title>
+  <desc>Trois acteurs (Admin, Responsable d'agence, Caissier) et leurs cas d'utilisation respectifs dans le système de gestion de boutique.</desc>
+
+  <rect x="150" y="40" width="560" height="1150" rx="10" fill="none" stroke="#333" stroke-width="2"/>
+  <text x="430" y="68" text-anchor="middle" font-size="19" font-weight="700" fill="#111">Système de Gestion de Boutique</text>
+
+  <!-- ===================== ADMIN ===================== -->
+  <g stroke="#111" stroke-width="2" fill="none" stroke-linecap="round">
+    <circle cx="60" cy="210" r="14" fill="none"/>
+    <line x1="60" y1="224" x2="60" y2="275"/>
+    <line x1="40" y1="245" x2="80" y2="245"/>
+    <line x1="60" y1="275" x2="42" y2="305"/>
+    <line x1="60" y1="275" x2="78" y2="305"/>
+  </g>
+  <text x="60" y="325" text-anchor="middle" font-size="14" font-weight="600" fill="#111">Admin</text>
+
+  <g stroke="#555" stroke-width="1.5">
+    <line x1="60" y1="260" x2="250" y2="110"/>
+    <line x1="60" y1="260" x2="250" y2="210"/>
+    <line x1="60" y1="260" x2="250" y2="310"/>
+    <line x1="60" y1="260" x2="250" y2="410"/>
+  </g>
+
+  <g>
+    <ellipse cx="430" cy="110" rx="180" ry="32" fill="#eef2f7" stroke="#555" stroke-width="1.5"/>
+    <text x="430" y="115" text-anchor="middle" font-size="15" fill="#111">Gérer les agences</text>
+
+    <ellipse cx="430" cy="210" rx="180" ry="32" fill="#eef2f7" stroke="#555" stroke-width="1.5"/>
+    <text x="430" y="215" text-anchor="middle" font-size="15" fill="#111">Gérer catégories &amp; produits</text>
+
+    <ellipse cx="430" cy="310" rx="180" ry="32" fill="#eef2f7" stroke="#555" stroke-width="1.5"/>
+    <text x="430" y="315" text-anchor="middle" font-size="15" fill="#111">Gérer les utilisateurs</text>
+
+    <ellipse cx="430" cy="410" rx="180" ry="32" fill="#eef2f7" stroke="#555" stroke-width="1.5"/>
+    <text x="430" y="415" text-anchor="middle" font-size="15" fill="#111">Tableau de bord global</text>
+  </g>
+
+  <!-- ===================== MANAGER ===================== -->
+  <g stroke="#111" stroke-width="2" fill="none" stroke-linecap="round">
+    <circle cx="60" cy="590" r="14" fill="none"/>
+    <line x1="60" y1="604" x2="60" y2="655"/>
+    <line x1="40" y1="625" x2="80" y2="625"/>
+    <line x1="60" y1="655" x2="42" y2="685"/>
+    <line x1="60" y1="655" x2="78" y2="685"/>
+  </g>
+  <text x="60" y="705" text-anchor="middle" font-size="14" font-weight="600" fill="#111">Responsable</text>
+  <text x="60" y="721" text-anchor="middle" font-size="14" font-weight="600" fill="#111">d'agence</text>
+
+  <g stroke="#555" stroke-width="1.5">
+    <line x1="60" y1="640" x2="250" y2="520"/>
+    <line x1="60" y1="640" x2="250" y2="620"/>
+    <line x1="60" y1="640" x2="250" y2="720"/>
+  </g>
+
+  <g>
+    <ellipse cx="430" cy="520" rx="180" ry="32" fill="#eef2f7" stroke="#555" stroke-width="1.5"/>
+    <text x="430" y="525" text-anchor="middle" font-size="15" fill="#111">Gérer stock &amp; prix (agence)</text>
+
+    <ellipse cx="430" cy="620" rx="180" ry="32" fill="#eef2f7" stroke="#555" stroke-width="1.5"/>
+    <text x="430" y="625" text-anchor="middle" font-size="15" fill="#111">Gérer les caissiers</text>
+
+    <ellipse cx="430" cy="720" rx="180" ry="32" fill="#eef2f7" stroke="#555" stroke-width="1.5"/>
+    <text x="430" y="725" text-anchor="middle" font-size="15" fill="#111">Consulter ventes de l'agence</text>
+  </g>
+
+  <!-- ===================== CAISSIER ===================== -->
+  <g stroke="#111" stroke-width="2" fill="none" stroke-linecap="round">
+    <circle cx="60" cy="900" r="14" fill="none"/>
+    <line x1="60" y1="914" x2="60" y2="965"/>
+    <line x1="40" y1="935" x2="80" y2="935"/>
+    <line x1="60" y1="965" x2="42" y2="995"/>
+    <line x1="60" y1="965" x2="78" y2="995"/>
+  </g>
+  <text x="60" y="1015" text-anchor="middle" font-size="14" font-weight="600" fill="#111">Caissier</text>
+
+  <g stroke="#555" stroke-width="1.5">
+    <line x1="60" y1="950" x2="250" y2="830"/>
+    <line x1="60" y1="950" x2="250" y2="930"/>
+    <line x1="60" y1="950" x2="250" y2="1030"/>
+  </g>
+
+  <g>
+    <ellipse cx="430" cy="830" rx="180" ry="32" fill="#eef2f7" stroke="#555" stroke-width="1.5"/>
+    <text x="430" y="835" text-anchor="middle" font-size="15" fill="#111">Créer une vente</text>
+
+    <ellipse cx="430" cy="930" rx="180" ry="32" fill="#eef2f7" stroke="#555" stroke-width="1.5"/>
+    <text x="430" y="935" text-anchor="middle" font-size="15" fill="#111">Générer un reçu</text>
+
+    <ellipse cx="430" cy="1030" rx="180" ry="32" fill="#eef2f7" stroke="#555" stroke-width="1.5"/>
+    <text x="430" y="1035" text-anchor="middle" font-size="15" fill="#111">Consulter historique des ventes</text>
+  </g>
+
+  <defs>
+    <marker id="arrowInclude" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10" fill="none" stroke="#666" stroke-width="1.5"/>
+    </marker>
+  </defs>
+  <line x1="430" y1="862" x2="430" y2="898" stroke="#666" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#arrowInclude)"/>
+  <text x="450" y="884" font-size="12" font-style="italic" fill="#666">«include»</text>
+
+  <g>
+    <path d="M250 1090 H590 V1150 H270 L250 1130 Z" fill="#fafafa" stroke="#999" stroke-width="1.5" stroke-dasharray="4,3"/>
+    <path d="M250 1090 V1130 H270" fill="none" stroke="#999" stroke-width="1.5" stroke-dasharray="4,3"/>
+    <text x="420" y="1112" text-anchor="middle" font-size="13" fill="#555">Note : les trois acteurs doivent</text>
+    <text x="420" y="1131" text-anchor="middle" font-size="13" fill="#555">s'authentifier avant tout accès au système</text>
+  </g>
+</svg>

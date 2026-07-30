@@ -1,0 +1,122 @@
+<svg viewBox="0 0 1400 1050" xmlns="http://www.w3.org/2000/svg" role="img" font-family="Arial, sans-serif">
+<title>Diagramme de blocs — Architecture du système de gestion de boutique</title>
+<desc>Diagramme d'architecture en couches : navigateur (présentation), application Django (vues, service, signals, admin), données (base de données, cache, médias), et services (génération PDF, import/export).</desc>
+
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+    <path d="M0,0 L10,5 L0,10 Z" fill="#555"/>
+  </marker>
+</defs>
+
+<g>
+  <rect x="100" y="40" width="1200" height="110" rx="8" fill="#eef2f7" stroke="#555" stroke-width="1.5"/>
+  <text x="700" y="70" text-anchor="middle" font-size="17" font-weight="700" fill="#111">Navigateur (Client)</text>
+  <text x="700" y="90" text-anchor="middle" font-size="12.5" fill="#555">Interface responsive — Tailwind CSS + Chart.js</text>
+  <rect x="220" y="105" width="150" height="28" rx="14" fill="#fafafa" stroke="#999"/>
+  <text x="295" y="123" text-anchor="middle" font-size="11.5" fill="#111">POS Caissier</text>
+  <rect x="625" y="105" width="150" height="28" rx="14" fill="#fafafa" stroke="#999"/>
+  <text x="700" y="123" text-anchor="middle" font-size="11.5" fill="#111">Tableau de bord</text>
+  <rect x="1030" y="105" width="150" height="28" rx="14" fill="#fafafa" stroke="#999"/>
+  <text x="1105" y="123" text-anchor="middle" font-size="11.5" fill="#111">Admin Django</text>
+</g>
+
+<line x1="700" y1="150" x2="700" y2="228" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+<line x1="690" y1="228" x2="690" y2="150" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+<text x="712" y="192" font-size="11.5" fill="#555">Requêtes / réponses HTTP</text>
+
+<rect x="60" y="230" width="1280" height="250" rx="8" fill="none" stroke="#999" stroke-width="1.3" stroke-dasharray="6,4"/>
+<text x="82" y="252" font-size="12.5" font-style="italic" fill="#555">Application Django (Backend)</text>
+
+<g>
+  <rect x="100" y="280" width="260" height="160" fill="#eef2f7" stroke="#555" stroke-width="1.5"/>
+  <text x="230" y="308" text-anchor="middle" font-size="14" font-weight="700" fill="#111">Vues &amp; URLs</text>
+  <text x="230" y="332" text-anchor="middle" font-size="11.5" fill="#555">Routage des requêtes</text>
+  <text x="230" y="350" text-anchor="middle" font-size="11.5" fill="#555">Formulaires &amp; validation</text>
+</g>
+
+<g>
+  <rect x="390" y="280" width="300" height="160" fill="#eef2f7" stroke="#555" stroke-width="1.5"/>
+  <text x="540" y="308" text-anchor="middle" font-size="14" font-weight="700" fill="#111">Couche de Service</text>
+  <text x="540" y="332" text-anchor="middle" font-size="11.5" fill="#555">Logique métier isolée</text>
+  <text x="540" y="350" text-anchor="middle" font-size="11.5" fill="#555">Calculs, règles de gestion</text>
+</g>
+
+<g>
+  <rect x="720" y="280" width="270" height="160" fill="#eef2f7" stroke="#555" stroke-width="1.5"/>
+  <text x="855" y="308" text-anchor="middle" font-size="14" font-weight="700" fill="#111">Signals</text>
+  <text x="855" y="332" text-anchor="middle" font-size="11.5" fill="#555">post_save / post_delete</text>
+  <text x="855" y="350" text-anchor="middle" font-size="11.5" fill="#555">Stock, totaux, cache, reçu</text>
+</g>
+
+<g>
+  <rect x="1020" y="280" width="260" height="160" fill="#eef2f7" stroke="#555" stroke-width="1.5"/>
+  <text x="1150" y="308" text-anchor="middle" font-size="14" font-weight="700" fill="#111">Admin Django</text>
+  <text x="1150" y="332" text-anchor="middle" font-size="11.5" fill="#555">Gestion interne</text>
+  <text x="1150" y="350" text-anchor="middle" font-size="11.5" fill="#555">Inlines, filtres, recherche</text>
+</g>
+
+<line x1="360" y1="360" x2="390" y2="360" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+<line x1="690" y1="360" x2="720" y2="360" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<line x1="700" y1="480" x2="700" y2="558" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+<text x="712" y="522" font-size="11.5" fill="#555">ORM (Django ORM)</text>
+
+<g>
+  <rect x="100" y="560" width="340" height="150" fill="#eef2f7" stroke="#555" stroke-width="1.5"/>
+  <text x="270" y="588" text-anchor="middle" font-size="14" font-weight="700" fill="#111">Base de données</text>
+  <text x="270" y="612" text-anchor="middle" font-size="11.5" fill="#555">PostgreSQL / MySQL</text>
+  <text x="270" y="630" text-anchor="middle" font-size="11.5" fill="#555">Modèles, relations, contraintes</text>
+</g>
+
+<g>
+  <rect x="520" y="560" width="340" height="150" fill="#eef2f7" stroke="#555" stroke-width="1.5"/>
+  <text x="690" y="588" text-anchor="middle" font-size="14" font-weight="700" fill="#111">Cache</text>
+  <text x="690" y="612" text-anchor="middle" font-size="11.5" fill="#555">Redis / cache Django</text>
+  <text x="690" y="630" text-anchor="middle" font-size="11.5" fill="#555">Agrégats, listes, paramètres</text>
+</g>
+
+<g>
+  <rect x="940" y="560" width="340" height="150" fill="#eef2f7" stroke="#555" stroke-width="1.5"/>
+  <text x="1110" y="588" text-anchor="middle" font-size="14" font-weight="700" fill="#111">Stockage médias</text>
+  <text x="1110" y="612" text-anchor="middle" font-size="11.5" fill="#555">Logos, images produits</text>
+  <text x="1110" y="630" text-anchor="middle" font-size="11.5" fill="#555">PDF des reçus</text>
+</g>
+
+<line x1="540" y1="440" x2="230" y2="560" stroke="#555" stroke-width="1.3" marker-end="url(#arr)"/>
+<text x="380" y="500" font-size="11" fill="#555">lecture/écriture</text>
+<line x1="855" y1="440" x2="300" y2="560" stroke="#555" stroke-width="1.3" marker-end="url(#arr)"/>
+<line x1="1150" y1="440" x2="370" y2="560" stroke="#555" stroke-width="1.3" marker-end="url(#arr)"/>
+<text x="1000" y="500" font-size="11" fill="#555">accès direct (admin)</text>
+
+<line x1="540" y1="440" x2="650" y2="560" stroke="#555" stroke-width="1.3" marker-end="url(#arr)"/>
+<line x1="855" y1="440" x2="730" y2="560" stroke="#555" stroke-width="1.3" marker-end="url(#arr)"/>
+<text x="640" y="500" font-size="11" fill="#555">cache.get_or_set /</text>
+<text x="640" y="514" font-size="11" fill="#555">invalidation</text>
+
+<g>
+  <rect x="200" y="790" width="420" height="130" fill="#eef2f7" stroke="#555" stroke-width="1.5"/>
+  <text x="410" y="818" text-anchor="middle" font-size="14" font-weight="700" fill="#111">Génération PDF</text>
+  <text x="410" y="842" text-anchor="middle" font-size="11.5" fill="#555">WeasyPrint / ReportLab</text>
+  <text x="410" y="860" text-anchor="middle" font-size="11.5" fill="#555">Reçus imprimables</text>
+</g>
+
+<g>
+  <rect x="680" y="790" width="480" height="130" fill="#eef2f7" stroke="#555" stroke-width="1.5"/>
+  <text x="920" y="818" text-anchor="middle" font-size="14" font-weight="700" fill="#111">Import / Export</text>
+  <text x="920" y="842" text-anchor="middle" font-size="11.5" fill="#555">CSV / Excel</text>
+  <text x="920" y="860" text-anchor="middle" font-size="11.5" fill="#555">Produits, catégories, inventaire (bulk)</text>
+</g>
+
+<polyline points="855,440 855,470 480,470 480,760 410,790" fill="none" stroke="#555" stroke-width="1.3" marker-end="url(#arr)"/>
+<text x="330" y="464" font-size="11" fill="#555">post_save Commande → génère reçu</text>
+
+<polyline points="540,440 540,500 900,500 900,760 920,790" fill="none" stroke="#555" stroke-width="1.3" marker-end="url(#arr)"/>
+<text x="930" y="494" font-size="11" fill="#555">upload / export en masse</text>
+
+<g>
+  <line x1="100" y1="990" x2="150" y2="990" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="160" y="995" font-size="12" fill="#555">Flux de données / appel</text>
+  <rect x="440" y="978" width="220" height="24" fill="none" stroke="#999" stroke-width="1.3" stroke-dasharray="6,4"/>
+  <text x="675" y="995" font-size="12" fill="#555">Frontière d'un sous-système</text>
+</g>
+</svg>
