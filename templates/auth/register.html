@@ -1,0 +1,65 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Créer un compte{% endblock %}
+{% block page_title %}Créer un compte employé{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-xl">
+
+  {% if messages %}
+    <div class="mb-4 space-y-2">
+      {% for message in messages %}
+        <div class="rounded-lg border border-green-200 bg-green-50 px-4 py-2.5 text-sm text-green-800">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <div class="rounded-xl border border-gray-100 bg-white p-6 shadow-sm sm:p-8">
+    <div class="mb-6">
+      <h2 class="text-lg font-semibold text-gray-900">Nouveau compte</h2>
+      <p class="mt-1 text-sm text-gray-500">
+        Créez un compte pour un Responsable d'agence ou un Caissier.
+      </p>
+    </div>
+
+    {% if form.non_field_errors %}
+      <div class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700">
+        {% for error in form.non_field_errors %}
+          <p>{{ error }}</p>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="space-y-5">
+        {% for field in form %}
+          <div{% if field.is_hidden %} class="hidden"{% endif %}>
+            {% if not field.is_hidden %}
+              <label for="{{ field.id_for_label }}" class="mb-1.5 block text-sm font-medium text-gray-700">
+                {{ field.label }}
+              </label>
+            {% endif %}
+            {{ field }}
+            {% if field.help_text %}
+              <p class="mt-1.5 text-xs text-gray-400">{{ field.help_text }}</p>
+            {% endif %}
+            {% if field.errors %}
+              <p class="mt-1.5 text-xs text-red-600">{{ field.errors.0 }}</p>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+
+      <button
+        type="submit"
+        class="mt-6 flex w-full items-center justify-center rounded-lg bg-primary-800 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-900 focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:ring-offset-2"
+      >
+        Créer le compte
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

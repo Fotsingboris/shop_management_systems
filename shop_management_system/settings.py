@@ -74,6 +74,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'shop_management_system.wsgi.application'
 AUTH_USER_MODEL = "users.Utilisateur"
+LOGIN_URL = "users:login"
+LOGIN_REDIRECT_URL = "general:dashboard"  # fallback only; the view overrides this per-role
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases

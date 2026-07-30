@@ -1,9 +1,21 @@
+"""Routes de l'app general.
+
+Si un general/urls.py existe déjà chez vous avec d'autres routes,
+fusionnez ces deux `path()` dedans plutôt que d'écraser le fichier.
+"""
+from __future__ import annotations
+
 from django.urls import path
 
-from general.views.admin_dashboard import AdminDashboard
+from general.views.admin_dashboard import AdminDashboardView, AgenceDashboardView
 
-app_name = 'general'
+app_name = "general"
+
 urlpatterns = [
-    # admin dashboard
-    path('admin/dashboard/', AdminDashboard.as_view(), name='admin_dashboard')
+    path("dashboard/", AdminDashboardView.as_view(), name="dashboard"),
+    path(
+        "agences/<slug:agence_slug>/dashboard/",
+        AgenceDashboardView.as_view(),
+        name="agence_dashboard",
+    ),
 ]

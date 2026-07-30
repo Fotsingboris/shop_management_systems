@@ -47,7 +47,11 @@
             </li>
           </ul>
         </div>
-
+        
+        {% if request.user.is_responsable_agence or request.user.is_admin %}
+          
+        
+          
         <div>
           <p class="nav-group-label px-3 pb-2 text-xs font-semibold uppercase tracking-wider text-primary-300">Catalogue</p>
           <ul class="space-y-1">
@@ -81,6 +85,8 @@
             </li>
           </ul>
         </div>
+
+        {% endif %}
 
         {% if request.user.is_admin %}
         <div>
