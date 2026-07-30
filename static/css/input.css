@@ -1,0 +1,59 @@
+/* =========================================================
+   Tailwind CSS entry point — Shop Management System
+   Compile:  npm run dev    (watch, for development)
+             npm run build  (minified, for production)
+   Output:   static/css/output.css
+   ========================================================= */
+
+@import "tailwindcss" source(none);
+
+/* Explicit template sources — adjust paths if your app/folder
+   names differ from users/products/sales/general. */
+@source "../../templates";
+@source "../../users/templates";
+@source "../../products/templates";
+@source "../../sales/templates";
+@source "../../general/templates";
+
+@theme {
+  /* Primary — Navy (brand color #000080) */
+  --color-primary-50: #F0F0FF;
+  --color-primary-100: #DBDBFF;
+  --color-primary-200: #B8B8FF;
+  --color-primary-300: #8585FF;
+  --color-primary-400: #4747FF;
+  --color-primary-500: #0A0AFF;
+  --color-primary-600: #0000D6;
+  --color-primary-700: #0000AD;
+  --color-primary-800: #000080; /* exact brand value */
+  --color-primary-900: #00005C;
+  --color-primary-950: #000038;
+
+  /* Secondary — Gold accent, complements the navy primary
+     (use for CTAs, highlights, active states) */
+  --color-secondary-50: #FEFAF0;
+  --color-secondary-100: #FDF4DD;
+  --color-secondary-200: #FBE9BB;
+  --color-secondary-300: #F9DA8B;
+  --color-secondary-400: #F6C751;
+  --color-secondary-500: #F3B416;
+  --color-secondary-600: #CB950B;
+  --color-secondary-700: #A57909;
+  --color-secondary-800: #7A5906;
+  --color-secondary-900: #574005;
+  --color-secondary-950: #352703;
+
+  /* Status colors (stock/order states) reuse Tailwind's built-in
+     scales — no redefinition needed:
+       success  -> green-*   (e.g. bg-green-600, text-green-700)
+       warning  -> amber-*   (low stock alerts)
+       danger   -> red-*     (out of stock / cancelled)
+       info     -> sky-*
+       neutral  -> gray-* / slate-* (backgrounds, borders, body text) */
+}
+
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-900 antialiased;
+  }
+}

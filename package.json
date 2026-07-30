@@ -1,0 +1,14 @@
+{
+  "name": "shop-management-system",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Tailwind CSS build pipeline for the Shop Management System Django project",
+  "scripts": {
+    "dev": "tailwindcss -i ./static/css/input.css -o ./static/css/output.css --watch",
+    "build": "tailwindcss -i ./static/css/input.css -o ./static/css/output.css --minify"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.3",
+    "tailwindcss": "^4.3.3"
+  }
+}

@@ -1,0 +1,220 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connexion — Shop Management System</title>
+  <link rel="stylesheet" href="{% static 'css/output.css' %}">
+</head>
+<body class="min-h-screen bg-gray-50 antialiased">
+
+  <div class="min-h-screen grid grid-cols-1 md:grid-cols-2">
+
+    <!-- Brand panel — hidden on mobile, shown from md breakpoint up -->
+    <div class="hidden md:flex relative flex-col justify-between overflow-hidden bg-gradient-to-br from-primary-900 via-primary-800 to-primary-700 p-10 lg:p-14 text-white">
+      <!-- decorative blurred accents -->
+      <div class="pointer-events-none absolute -top-24 -left-24 h-72 w-72 rounded-full bg-secondary-500/20 blur-3xl"></div>
+      <div class="pointer-events-none absolute bottom-0 right-0 h-96 w-96 rounded-full bg-primary-500/20 blur-3xl"></div>
+
+      <div class="relative flex items-center gap-3">
+        <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-secondary-500 text-primary-900 font-bold text-lg shadow-lg">
+          SM
+        </div>
+        <span class="text-lg font-semibold tracking-wide">Shop Management System</span>
+      </div>
+
+      <div class="relative max-w-md">
+        <h1 class="text-3xl lg:text-4xl font-bold leading-tight">
+          Gérez toutes vos agences depuis un seul endroit.
+        </h1>
+        <p class="mt-4 text-primary-100/80 text-sm lg:text-base">
+          Stock, ventes, reçus et rapports multi-agences, centralisés et à jour en temps réel.
+        </p>
+
+        <ul class="mt-8 space-y-3 text-sm text-primary-100/90">
+          <li class="flex items-center gap-3">
+            <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/10">
+              <svg class="h-3.5 w-3.5 text-secondary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            </span>
+            Suivi des stocks par agence en temps réel
+          </li>
+          <li class="flex items-center gap-3">
+            <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/10">
+              <svg class="h-3.5 w-3.5 text-secondary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            </span>
+            Point de vente rapide et reçus automatiques
+          </li>
+          <li class="flex items-center gap-3">
+            <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/10">
+              <svg class="h-3.5 w-3.5 text-secondary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            </span>
+            Tableaux de bord et comparaison entre agences
+          </li>
+        </ul>
+      </div>
+
+      <p class="relative text-xs text-primary-100/60">
+        &copy; {% now "Y" %} Shop Management System. Tous droits réservés.
+      </p>
+    </div>
+
+    <!-- Form panel -->
+    <div class="flex flex-col items-center justify-center px-4 py-10 sm:px-6 lg:px-16">
+
+      <!-- Mobile-only brand header -->
+      <div class="mb-8 flex items-center gap-3 md:hidden">
+        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-800 text-secondary-400 font-bold shadow-md">
+          SM
+        </div>
+        <span class="text-base font-semibold text-primary-900">Shop Management System</span>
+      </div>
+
+      <div class="w-full max-w-md rounded-2xl border border-gray-100 bg-white p-6 shadow-xl shadow-primary-900/5 sm:p-8">
+        <div class="mb-6 text-center sm:text-left">
+          <h2 class="text-xl font-bold text-gray-900 sm:text-2xl">Connexion</h2>
+          <p class="mt-1 text-sm text-gray-500">Accédez à votre espace de gestion.</p>
+        </div>
+
+        {% if messages %}
+          <div class="mb-4 space-y-2">
+            {% for message in messages %}
+              <div class="rounded-lg border border-primary-200 bg-primary-50 px-4 py-2.5 text-sm text-primary-800">
+                {{ message }}
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        {% if form.non_field_errors %}
+          <div class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700">
+            {% for error in form.non_field_errors %}
+              <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <form method="post" class="space-y-5" novalidate>
+          {% csrf_token %}
+
+          <!-- Username -->
+          <div>
+            <label for="id_username" class="mb-1.5 block text-sm font-medium text-gray-700">
+              Nom d'utilisateur
+            </label>
+            <div class="relative">
+              <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                </svg>
+              </span>
+              <input
+                type="text"
+                name="username"
+                id="id_username"
+                autocomplete="username"
+                value="{{ form.username.value|default_if_none:'' }}"
+                placeholder="ex. j.dupont"
+                required
+                autofocus
+                class="block w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-3 text-sm text-gray-900 placeholder-gray-400 shadow-sm transition focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600/30"
+              >
+            </div>
+            {% if form.username.errors %}
+              <p class="mt-1.5 text-xs text-red-600">{{ form.username.errors.0 }}</p>
+            {% endif %}
+          </div>
+
+          <!-- Password -->
+          <div>
+            <div class="mb-1.5 flex items-center justify-between">
+              <label for="id_password" class="block text-sm font-medium text-gray-700">
+                Mot de passe
+              </label>
+              <a href="" class="text-xs font-medium text-primary-700 hover:text-primary-900">
+                Mot de passe oublié ?
+              </a>
+            </div>
+            <div class="relative">
+              <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                </svg>
+              </span>
+              <input
+                type="password"
+                name="password"
+                id="id_password"
+                autocomplete="current-password"
+                placeholder="••••••••"
+                required
+                class="block w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-10 text-sm text-gray-900 placeholder-gray-400 shadow-sm transition focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600/30"
+              >
+              <button
+                type="button"
+                onclick="togglePassword()"
+                class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600"
+                aria-label="Afficher / masquer le mot de passe"
+              >
+                <svg id="eye-icon" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </button>
+            </div>
+            {% if form.password.errors %}
+              <p class="mt-1.5 text-xs text-red-600">{{ form.password.errors.0 }}</p>
+            {% endif %}
+          </div>
+
+          <!-- Remember me -->
+          <div class="flex items-center">
+            <input
+              type="checkbox"
+              name="remember"
+              id="id_remember"
+              class="h-4 w-4 rounded border-gray-300 accent-primary-700 focus:ring-primary-600/30"
+            >
+            <label for="id_remember" class="ml-2 text-sm text-gray-600">
+              Se souvenir de moi
+            </label>
+          </div>
+
+          {% if next %}
+            <input type="hidden" name="next" value="{{ next }}">
+          {% endif %}
+
+          <button
+            type="submit"
+            class="flex w-full items-center justify-center rounded-lg bg-primary-800 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-900 focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:ring-offset-2 active:bg-primary-950"
+          >
+            Se connecter
+          </button>
+        </form>
+
+        <p class="mt-6 text-center text-xs text-gray-400 md:hidden">
+          &copy; {% now "Y" %} Shop Management System
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function togglePassword() {
+      const input = document.getElementById('id_password');
+      const eye = document.getElementById('eye-icon');
+      const isHidden = input.type === 'password';
+      input.type = isHidden ? 'text' : 'password';
+      eye.innerHTML = isHidden
+        ? '<path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.243 4.243L9.88 9.88" />'
+        : '<path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />';
+    }
+  </script>
+</body>
+</html>
