@@ -137,9 +137,12 @@
               <label for="id_password" class="block text-sm font-medium text-gray-700">
                 Mot de passe
               </label>
-              <a href="" class="text-xs font-medium text-primary-700 hover:text-primary-900">
+              {% url 'password_reset' as password_reset_url %}
+              {% if password_reset_url %}
+              <a href="{{ password_reset_url }}" class="text-xs font-medium text-primary-700 hover:text-primary-900">
                 Mot de passe oublié ?
               </a>
+              {% endif %}
             </div>
             <div class="relative">
               <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">

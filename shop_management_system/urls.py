@@ -25,9 +25,7 @@ from shop_management_system import settings
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', TemplateView.as_view(template_name='auth/login.html'), name='login'),
-    
+    path('admin/', admin.site.urls),    
     path('general', include('general.urls')),
     path('sales/', include('sales.urls')),
     path('users/', include('users.urls')),
