@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from django.urls import path
 
-from general.views.admin_dashboard import AdminDashboardView, AgenceDashboardView
+from general.views.admin_dashboard import AdminDashboardView, AgenceDashboardView, ParametresEntrepriseUpdateView
 
 app_name = "general"
 
@@ -18,4 +18,5 @@ urlpatterns = [
         AgenceDashboardView.as_view(),
         name="agence_dashboard",
     ),
+    path("parametres/", ParametresEntrepriseUpdateView.as_view(), name="parametres"),
 ]

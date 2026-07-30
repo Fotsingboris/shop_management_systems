@@ -1,0 +1,145 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Paramètres de l'entreprise{% endblock %}
+{% block page_title %}Paramètres de l'entreprise{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-4xl">
+
+  {% if messages %}
+    <div class="mb-4 space-y-2">
+      {% for message in messages %}
+        <div class="rounded-lg border border-green-200 bg-green-50 px-4 py-2.5 text-sm text-green-800">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {% if form.non_field_errors %}
+    <div class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700">
+      {% for error in form.non_field_errors %}
+        <p>{{ error }}</p>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <form method="post" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+
+    <div class="rounded-xl border border-gray-100 bg-white p-6 shadow-sm sm:p-10">
+
+      <!-- Identité -->
+      <div class="border-b border-gray-100 pb-8">
+        <h2 class="text-lg font-semibold text-gray-900">Identité de l'entreprise</h2>
+        <p class="mt-1 text-sm text-gray-500">Nom et logo affichés dans l'application et sur les reçus.</p>
+
+        <div class="mt-6 flex flex-col gap-6 sm:flex-row sm:items-start">
+          {% if parametres.logo %}
+            <img src="{{ parametres.logo.url }}" alt="{{ parametres.nom }}" class="h-20 w-20 shrink-0 rounded-lg border border-gray-100 object-cover">
+          {% else %}
+            <div class="flex h-20 w-20 shrink-0 items-center justify-center rounded-lg border border-dashed border-gray-300 text-center text-xs text-gray-400">
+              Aucun logo
+            </div>
+          {% endif %}
+          <div class="flex-1">
+            <label for="{{ form.logo.id_for_label }}" class="mb-1.5 block text-sm font-medium text-gray-700">
+              {{ form.logo.label }}
+            </label>
+            {{ form.logo }}
+            {% if form.logo.help_text %}
+              <p class="mt-1.5 text-xs text-gray-400">{{ form.logo.help_text }}</p>
+            {% endif %}
+            {% if form.logo.errors %}
+              <p class="mt-1.5 text-xs text-red-600">{{ form.logo.errors.0 }}</p>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="mt-6 grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
+          <div>
+            <label for="{{ form.nom.id_for_label }}" class="mb-1.5 block text-sm font-medium text-gray-700">{{ form.nom.label }}</label>
+            {{ form.nom }}
+            {% if form.nom.errors %}<p class="mt-1.5 text-xs text-red-600">{{ form.nom.errors.0 }}</p>{% endif %}
+          </div>
+          <div>
+            <label for="{{ form.slogan.id_for_label }}" class="mb-1.5 block text-sm font-medium text-gray-700">{{ form.slogan.label }}</label>
+            {{ form.slogan }}
+            {% if form.slogan.errors %}<p class="mt-1.5 text-xs text-red-600">{{ form.slogan.errors.0 }}</p>{% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Coordonnées -->
+      <div class="border-b border-gray-100 py-8">
+        <h2 class="text-lg font-semibold text-gray-900">Coordonnées</h2>
+        <p class="mt-1 text-sm text-gray-500">Utilisées sur les reçus et pour vous contacter.</p>
+
+        <div class="mt-6 space-y-5">
+          <div>
+            <label for="{{ form.adresse.id_for_label }}" class="mb-1.5 block text-sm font-medium text-gray-700">{{ form.adresse.label }}</label>
+            {{ form.adresse }}
+            {% if form.adresse.errors %}<p class="mt-1.5 text-xs text-red-600">{{ form.adresse.errors.0 }}</p>{% endif %}
+          </div>
+
+          <div class="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
+            <div>
+              <label for="{{ form.telephone.id_for_label }}" class="mb-1.5 block text-sm font-medium text-gray-700">{{ form.telephone.label }}</label>
+              {{ form.telephone }}
+              {% if form.telephone.errors %}<p class="mt-1.5 text-xs text-red-600">{{ form.telephone.errors.0 }}</p>{% endif %}
+            </div>
+            <div>
+              <label for="{{ form.email.id_for_label }}" class="mb-1.5 block text-sm font-medium text-gray-700">{{ form.email.label }}</label>
+              {{ form.email }}
+              {% if form.email.errors %}<p class="mt-1.5 text-xs text-red-600">{{ form.email.errors.0 }}</p>{% endif %}
+            </div>
+          </div>
+
+          <div>
+            <label for="{{ form.site_web.id_for_label }}" class="mb-1.5 block text-sm font-medium text-gray-700">{{ form.site_web.label }}</label>
+            {{ form.site_web }}
+            {% if form.site_web.errors %}<p class="mt-1.5 text-xs text-red-600">{{ form.site_web.errors.0 }}</p>{% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Facturation & reçus -->
+      <div class="pt-8">
+        <h2 class="text-lg font-semibold text-gray-900">Facturation &amp; reçus</h2>
+        <p class="mt-1 text-sm text-gray-500">Affichées sur chaque reçu généré.</p>
+
+        <div class="mt-6 space-y-5">
+          <div class="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
+            <div>
+              <label for="{{ form.tax_id.id_for_label }}" class="mb-1.5 block text-sm font-medium text-gray-700">{{ form.tax_id.label }}</label>
+              {{ form.tax_id }}
+              {% if form.tax_id.errors %}<p class="mt-1.5 text-xs text-red-600">{{ form.tax_id.errors.0 }}</p>{% endif %}
+            </div>
+            <div>
+              <label for="{{ form.devise.id_for_label }}" class="mb-1.5 block text-sm font-medium text-gray-700">{{ form.devise.label }}</label>
+              {{ form.devise }}
+              {% if form.devise.errors %}<p class="mt-1.5 text-xs text-red-600">{{ form.devise.errors.0 }}</p>{% endif %}
+            </div>
+          </div>
+
+          <div>
+            <label for="{{ form.note_pied_page.id_for_label }}" class="mb-1.5 block text-sm font-medium text-gray-700">{{ form.note_pied_page.label }}</label>
+            {{ form.note_pied_page }}
+            {% if form.note_pied_page.help_text %}<p class="mt-1.5 text-xs text-gray-400">{{ form.note_pied_page.help_text }}</p>{% endif %}
+            {% if form.note_pied_page.errors %}<p class="mt-1.5 text-xs text-red-600">{{ form.note_pied_page.errors.0 }}</p>{% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-6 flex justify-end">
+      <button
+        type="submit"
+        class="flex items-center justify-center rounded-lg bg-primary-800 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-900 focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:ring-offset-2"
+      >
+        Enregistrer
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}
