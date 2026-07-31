@@ -3,7 +3,14 @@ from __future__ import annotations
 
 from django.contrib import admin
 
-from products.models import Categorie, Produit, ProduitAgence, TransfertStock
+from products.models import (
+    Categorie,
+    ImportCategories,
+    ImportProduits,
+    Produit,
+    ProduitAgence,
+    TransfertStock,
+)
 
 
 class ProduitAgenceInline(admin.TabularInline):
@@ -67,3 +74,30 @@ class TransfertStockAdmin(admin.ModelAdmin):
     readonly_fields = ("created_at", "updated_at")
     list_select_related = ("produit", "agence_source", "agence_destination", "demande_par", "approuve_par")
     date_hierarchy = "created_at"
+
+
+class _ImportAdmin(admin.ModelAdmin):
+    """Base commune : ces fiches ne se créent/modifient que via l'upload
+    (EF-2.3, EF-3.1), l'admin sert uniquement à consulter le résultat."""
+
+    list_display = ("nom_fichier", "statut", "lignes_reussies", "lignes_echouees", "importe_par", "created_at")
+    list_filter = ("statut",)
+    readonly_fields = (
+        "fichier", "statut", "total_lignes", "lignes_reussies", "lignes_echouees",
+        "rapport", "importe_par", "created_at", "updated_at",
+    )
+    list_select_related = ("importe_par",)
+    date_hierarchy = "created_at"
+
+    def has_add_permission(self, request) -> bool:
+        return False
+
+
+@admin.register(ImportCategories)
+class ImportCategoriesAdmin(_ImportAdmin):
+    pass
+
+
+@admin.register(ImportProduits)
+class ImportProduitsAdmin(_ImportAdmin):
+    pass

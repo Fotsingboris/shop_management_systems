@@ -83,3 +83,11 @@
 2026-07-31 22:03:38,931 [INFO] django.utils.autoreload - Watching for file changes with StatReloader
 2026-07-31 22:04:31,718 [INFO] django.utils.autoreload - C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\products\urls.py changed, reloading.
 2026-07-31 22:05:02,302 [INFO] django.utils.autoreload - Watching for file changes with StatReloader
+2026-07-31 22:35:11,754 [INFO] django.utils.autoreload - C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\products\models.py changed, reloading.
+2026-07-31 22:35:39,808 [INFO] django.utils.autoreload - Watching for file changes with StatReloader
+2026-07-31 22:38:04,497 [INFO] django.utils.autoreload - C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\products\apps.py changed, reloading.
+2026-07-31 22:38:27,479 [INFO] django.utils.autoreload - Watching for file changes with StatReloader
+2026-07-31 22:43:29,507 [INFO] django.utils.autoreload - C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\products\admin.py changed, reloading.
+2026-07-31 22:43:51,969 [INFO] django.utils.autoreload - Watching for file changes with StatReloader
+2026-07-31 22:47:27,014 [INFO] django.utils.autoreload - C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\products\urls.py changed, reloading.
+2026-07-31 22:47:40,286 [INFO] django.utils.autoreload - Watching for file changes with StatReloader
