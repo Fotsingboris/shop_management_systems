@@ -36,6 +36,7 @@
     --container-xs: 20rem;
     --container-md: 28rem;
     --container-xl: 36rem;
+    --container-2xl: 42rem;
     --container-3xl: 48rem;
     --container-4xl: 56rem;
     --text-xs: 0.75rem;
@@ -454,6 +455,9 @@
   .w-full {
     width: 100%;
   }
+  .max-w-2xl {
+    max-width: var(--container-2xl);
+  }
   .max-w-3xl {
     max-width: var(--container-3xl);
   }
@@ -471,6 +475,9 @@
   }
   .min-w-\[640px\] {
     min-width: 640px;
+  }
+  .min-w-\[880px\] {
+    min-width: 880px;
   }
   .flex-1 {
     flex: 1;
@@ -1088,11 +1095,17 @@
     background-color: var(--color-primary-950);
   }
   @media (width >= 40rem) {
+    .sm\:col-span-2 {
+      grid-column: span 2 / span 2;
+    }
     .sm\:block {
       display: block;
     }
     .sm\:flex {
       display: flex;
+    }
+    .sm\:w-56 {
+      width: calc(var(--spacing) * 56);
     }
     .sm\:max-w-xs {
       max-width: var(--container-xs);

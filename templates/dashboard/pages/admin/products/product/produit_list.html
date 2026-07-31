@@ -1,0 +1,125 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Produits{% endblock %}
+{% block page_title %}Produits{% endblock %}
+
+{% block content %}
+<div class="space-y-4">
+
+  {% if messages %}
+    <div class="space-y-2">
+      {% for message in messages %}
+        <div class="rounded-lg border border-green-200 bg-green-50 px-4 py-2.5 text-sm text-green-800">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- Toolbar -->
+  <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <form method="get" class="flex w-full flex-col gap-3 sm:flex-row sm:items-center">
+      <div class="relative w-full sm:max-w-xs">
+        <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
+        </span>
+        <input
+          type="text" name="q" value="{{ q }}" placeholder="Rechercher un produit ou un SKU…"
+          class="block w-full rounded-lg border border-gray-300 bg-white py-2 pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600/30"
+        >
+      </div>
+      <select name="categorie" onchange="this.form.submit()"
+        class="block w-full rounded-lg border border-gray-300 bg-white py-2 px-3 text-sm text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600/30 sm:w-56">
+        <option value="">Toutes les catégories</option>
+        {% for categorie in categories %}
+          <option value="{{ categorie.pk }}" {% if categorie_id == categorie.pk|stringformat:"s" %}selected{% endif %}>{{ categorie.nom }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit" class="hidden">Filtrer</button>
+    </form>
+
+    <div class="flex shrink-0 gap-2">
+      <a href="{% url 'products:produit_import' %}"
+         class="flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50">
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
+        Importer (Excel)
+      </a>
+      <a href="{% url 'products:produit_create' %}"
+         class="flex items-center justify-center gap-2 rounded-lg bg-primary-800 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-900">
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+        Nouveau produit
+      </a>
+    </div>
+  </div>
+
+  <!-- Datatable : défilement horizontal sur petits écrans plutôt qu'un
+       empilement en cartes, pour garder les colonnes alignées et
+       comparables même sur mobile. -->
+  <div class="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
+    <div class="overflow-x-auto">
+      <table class="w-full min-w-[880px] text-left text-sm">
+        <thead class="border-b border-gray-100 bg-gray-50">
+          <tr>
+            <th scope="col" class="px-4 py-3 font-medium text-gray-500">Nom</th>
+            <th scope="col" class="px-4 py-3 font-medium text-gray-500">SKU</th>
+            <th scope="col" class="px-4 py-3 font-medium text-gray-500">Catégorie</th>
+            <th scope="col" class="px-4 py-3 text-right font-medium text-gray-500">Prix d'achat</th>
+            <th scope="col" class="px-4 py-3 text-right font-medium text-gray-500">Prix vente (défaut)</th>
+            <th scope="col" class="px-4 py-3 text-right font-medium text-gray-500">Agences</th>
+            <th scope="col" class="px-4 py-3 text-right font-medium text-gray-500">Stock total</th>
+            <th scope="col" class="px-4 py-3 font-medium text-gray-500">Statut</th>
+            <th scope="col" class="px-4 py-3 text-right font-medium text-gray-500">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          {% for produit in produits %}
+            <tr class="hover:bg-gray-50">
+              <td class="px-4 py-3 font-medium text-gray-900">{{ produit.nom }}</td>
+              <td class="px-4 py-3 text-gray-500">{{ produit.sku }}</td>
+              <td class="px-4 py-3 text-gray-500">{{ produit.categorie.nom|default:"—" }}</td>
+              <td class="px-4 py-3 text-right text-gray-500">{{ produit.prix_achat }}</td>
+              <td class="px-4 py-3 text-right text-gray-500">{{ produit.prix_vente_defaut }}</td>
+              <td class="px-4 py-3 text-right text-gray-500">{{ produit.nombre_agences }}</td>
+              <td class="px-4 py-3 text-right text-gray-500">{{ produit.stock_total }}</td>
+              <td class="px-4 py-3">
+                {% if produit.actif %}
+                  <span class="inline-flex items-center rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-medium text-green-800">Actif</span>
+                {% else %}
+                  <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600">Inactif</span>
+                {% endif %}
+              </td>
+              <td class="px-4 py-3 text-right">
+                <a href="{% url 'products:produit_update' produit.pk %}" class="text-primary-700 hover:text-primary-900">Modifier</a>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="9" class="px-4 py-10 text-center text-sm text-gray-400">
+                Aucun produit{% if q %} pour « {{ q }} »{% endif %}.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+      <div class="flex flex-col items-center justify-between gap-3 border-t border-gray-100 px-4 py-3 sm:flex-row">
+        <p class="text-xs text-gray-500">
+          Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}
+          ({{ page_obj.paginator.count }} produit{{ page_obj.paginator.count|pluralize }})
+        </p>
+        <div class="flex gap-1">
+          {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% if categorie_id %}&categorie={{ categorie_id }}{% endif %}"
+               class="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50">Précédent</a>
+          {% endif %}
+          {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q }}{% endif %}{% if categorie_id %}&categorie={{ categorie_id }}{% endif %}"
+               class="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50">Suivant</a>
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

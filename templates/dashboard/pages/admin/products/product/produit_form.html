@@ -1,0 +1,52 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}{% if object %}Modifier le produit{% else %}Nouveau produit{% endif %}{% endblock %}
+{% block page_title %}{% if object %}Modifier le produit{% else %}Nouveau produit{% endif %}{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-2xl">
+
+  <div class="rounded-xl border border-gray-100 bg-white p-6 shadow-sm sm:p-8">
+    <div class="mb-6">
+      <h2 class="text-lg font-semibold text-gray-900">{% if object %}Modifier le produit{% else %}Nouveau produit{% endif %}</h2>
+      <p class="mt-1 text-sm text-gray-500">
+        Le prix d'achat et le prix de vente par défaut sont communs à toutes les agences.
+        Le prix de vente réel et le stock, propres à chaque agence, se gèrent depuis « Stock &amp; prix ».
+      </p>
+    </div>
+
+    {% if form.non_field_errors %}
+      <div class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700">
+        {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+      </div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" novalidate>
+      {% csrf_token %}
+      <div class="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
+        {% for field in form %}
+          <div class="{% if field.name == 'description' or field.name == 'image' %}sm:col-span-2{% endif %}">
+            <label for="{{ field.id_for_label }}" class="mb-1.5 block text-sm font-medium text-gray-700">
+              {{ field.label }}
+            </label>
+            {{ field }}
+            {% if field.help_text %}
+              <p class="mt-1.5 text-xs text-gray-400">{{ field.help_text }}</p>
+            {% endif %}
+            {% if field.errors %}
+              <p class="mt-1.5 text-xs text-red-600">{{ field.errors.0 }}</p>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+
+      <div class="mt-6 flex items-center gap-3">
+        <button type="submit" class="flex items-center justify-center rounded-lg bg-primary-800 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-900 focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:ring-offset-2">
+          {% if object %}Enregistrer les modifications{% else %}Créer le produit{% endif %}
+        </button>
+        <a href="{% url 'products:produit_list' %}" class="text-sm font-medium text-gray-600 hover:text-gray-900">Annuler</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

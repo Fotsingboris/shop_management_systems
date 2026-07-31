@@ -1,7 +1,8 @@
-"""Tâches Celery du catalogue produit (EF-2.3 : import de catégories)."""
+"""Tâches Celery du catalogue produit (EF-2.3 : import de catégories, EF-3.1 : import de produits)."""
 from __future__ import annotations
 
 import logging
+from decimal import Decimal, InvalidOperation
 from typing import Any, Dict, List, Optional
 
 from celery import shared_task
@@ -12,6 +13,9 @@ logger = logging.getLogger("shop.products")
 
 REQUIRED_COLUMNS = {"nom"}
 KNOWN_COLUMNS = {"nom", "parent", "actif"}
+
+REQUIRED_COLUMNS_PRODUITS = {"nom", "sku", "categorie", "prix_achat", "prix_vente_defaut"}
+KNOWN_COLUMNS_PRODUITS = REQUIRED_COLUMNS_PRODUITS | {"unite", "description", "actif"}
 
 
 def _normalize_header(value: Any) -> str:
@@ -24,6 +28,15 @@ def _to_bool(value: Any, default: bool = True) -> bool:
     if isinstance(value, bool):
         return value
     return str(value).strip().lower() in {"1", "true", "vrai", "oui", "yes", "y"}
+
+
+def _to_decimal(value: Any) -> Optional[Decimal]:
+    if value in (None, ""):
+        return None
+    try:
+        return Decimal(str(value).strip().replace(",", "."))
+    except (InvalidOperation, ValueError):
+        return None
 
 
 @shared_task(bind=True)
@@ -137,6 +150,148 @@ def importer_categories(self, import_id: str) -> Dict[str, int]:
 
     except Exception as exc:  # noqa: BLE001 - erreur globale (fichier illisible, colonne manquante...)
         logger.exception("Échec de l'import de catégories %s", import_id)
+        import_obj.statut = ImportStatut.ECHEC
+        rapport.append({"ligne": None, "nom": None, "statut": "erreur", "message": str(exc)})
+
+    import_obj.total_lignes = reussies + echouees
+    import_obj.lignes_reussies = reussies
+    import_obj.lignes_echouees = echouees
+    import_obj.rapport = rapport
+    import_obj.save()
+
+    return {"reussies": reussies, "echouees": echouees}
+
+
+@shared_task(bind=True)
+def importer_produits(self, import_id: str) -> Dict[str, int]:
+    """Traite un fichier Excel de produits en arrière-plan (EF-3.1).
+
+    Colonnes attendues (insensibles à la casse) :
+      - nom                : obligatoire
+      - sku                : obligatoire, unique — sert de clé de mise à
+                             jour (une ligne dont le SKU existe déjà met à
+                             jour le produit plutôt que d'en créer un
+                             second).
+      - categorie          : obligatoire, nom de la catégorie. Si elle
+                             n'existe pas encore, elle est créée à la
+                             volée via get_or_create plutôt que de faire
+                             échouer la ligne (pratique pour un import
+                             massif où toutes les catégories n'ont pas
+                             forcément été créées à l'avance).
+      - prix_achat         : obligatoire, nombre.
+      - prix_vente_defaut  : obligatoire, nombre.
+      - unite              : optionnel, défaut "unité".
+      - description        : optionnel.
+      - actif              : optionnel, défaut vrai.
+
+    Le prix de vente réellement pratiqué et le stock, propres à chaque
+    agence (ProduitAgence), ne sont pas traités par cet import : voir
+    « Stock & prix » (EF-4).
+    """
+    import openpyxl
+
+    from products.models import Categorie, ImportProduits, Produit
+
+    import_obj = ImportProduits.objects.get(pk=import_id)
+    import_obj.statut = ImportStatut.EN_COURS
+    import_obj.save(update_fields=["statut", "updated_at"])
+
+    rapport: List[Dict[str, Any]] = []
+    reussies = 0
+    echouees = 0
+
+    try:
+        workbook = openpyxl.load_workbook(import_obj.fichier.path, read_only=True, data_only=True)
+        sheet = workbook.active
+        rows = sheet.iter_rows(values_only=True)
+
+        header = next(rows, None)
+        if header is None:
+            raise ValueError("Le fichier est vide.")
+
+        columns = [_normalize_header(c) for c in header]
+        missing = REQUIRED_COLUMNS_PRODUITS - set(columns)
+        if missing:
+            raise ValueError(f"Colonne(s) manquante(s) : {', '.join(sorted(missing))}")
+
+        col_index = {name: idx for idx, name in enumerate(columns) if name in KNOWN_COLUMNS_PRODUITS}
+        # Cache local (par exécution de tâche) des catégories déjà vues,
+        # pour éviter une requête par ligne et pour réutiliser une
+        # catégorie tout juste créée par une ligne précédente du même
+        # fichier.
+        categories_par_nom = {c.nom.strip().lower(): c for c in Categorie.objects.all()}
+
+        def cell(row: tuple, key: str) -> Any:
+            idx = col_index.get(key)
+            return row[idx] if idx is not None and idx < len(row) else None
+
+        for ligne_num, row in enumerate(rows, start=2):
+            if row is None or all(c in (None, "") for c in row):
+                continue  # ligne vide, on l'ignore silencieusement
+
+            nom = str(cell(row, "nom") or "").strip()
+            sku = str(cell(row, "sku") or "").strip()
+            categorie_nom = str(cell(row, "categorie") or "").strip()
+            prix_achat = _to_decimal(cell(row, "prix_achat"))
+            prix_vente_defaut = _to_decimal(cell(row, "prix_vente_defaut"))
+
+            if not nom or not sku or not categorie_nom:
+                echouees += 1
+                rapport.append({
+                    "ligne": ligne_num, "nom": nom or None, "statut": "erreur",
+                    "message": "Nom, SKU et catégorie sont obligatoires.",
+                })
+                continue
+
+            if prix_achat is None or prix_vente_defaut is None:
+                echouees += 1
+                rapport.append({
+                    "ligne": ligne_num, "nom": nom, "statut": "erreur",
+                    "message": "Prix d'achat et prix de vente par défaut doivent être des nombres valides.",
+                })
+                continue
+
+            try:
+                categorie_obj = categories_par_nom.get(categorie_nom.lower())
+                if categorie_obj is None:
+                    # get_or_create : une catégorie mentionnée dans le fichier
+                    # mais absente de la base est créée à la volée plutôt que
+                    # de faire échouer la ligne (EF-3.1).
+                    categorie_obj, _created = Categorie.objects.get_or_create(
+                        nom__iexact=categorie_nom, defaults={"nom": categorie_nom}
+                    )
+                    categories_par_nom[categorie_nom.lower()] = categorie_obj
+
+                unite = str(cell(row, "unite") or "").strip() or "unité"
+                description = str(cell(row, "description") or "").strip()
+                actif = _to_bool(cell(row, "actif"), default=True)
+
+                produit, created = Produit.objects.update_or_create(
+                    sku=sku,
+                    defaults={
+                        "nom": nom,
+                        "categorie": categorie_obj,
+                        "prix_achat": prix_achat,
+                        "prix_vente_defaut": prix_vente_defaut,
+                        "unite": unite,
+                        "description": description,
+                        "actif": actif,
+                    },
+                )
+                action = "créé" if created else "mis à jour"
+                reussies += 1
+                rapport.append({
+                    "ligne": ligne_num, "nom": nom, "statut": "ok",
+                    "message": f"Produit {action} (catégorie « {categorie_obj.nom} »).",
+                })
+            except Exception as exc:  # noqa: BLE001 - on veut consigner toute erreur ligne par ligne
+                echouees += 1
+                rapport.append({"ligne": ligne_num, "nom": nom, "statut": "erreur", "message": str(exc)})
+
+        import_obj.statut = ImportStatut.TERMINE
+
+    except Exception as exc:  # noqa: BLE001 - erreur globale (fichier illisible, colonne manquante...)
+        logger.exception("Échec de l'import de produits %s", import_id)
         import_obj.statut = ImportStatut.ECHEC
         rapport.append({"ligne": None, "nom": None, "statut": "erreur", "message": str(exc)})
 

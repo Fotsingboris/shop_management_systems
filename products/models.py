@@ -324,3 +324,64 @@ class ImportCategories(BaseModel):
         import os
 
         return os.path.basename(self.fichier.name) if self.fichier else ""
+
+
+class ImportProduits(BaseModel):
+    """Suivi d'un import en masse de produits via Excel (EF-3.x).
+
+    Même principe que ImportCategories : le fichier est traité en
+    arrière-plan par products.tasks.importer_produits, et cette fiche
+    garde la trace du résultat (rapport ligne par ligne) une fois la
+    tâche Celery terminée.
+    """
+
+    fichier = models.FileField(
+        upload_to="imports/produits/",
+        help_text="Fichier Excel (.xlsx) contenant les produits à importer.",
+    )
+    statut = models.CharField(
+        max_length=20,
+        choices=ImportStatut.choices,
+        default=ImportStatut.EN_ATTENTE,
+        db_index=True,
+        help_text="Statut courant du traitement.",
+    )
+    total_lignes = models.PositiveIntegerField(
+        default=0,
+        help_text="Nombre de lignes traitées (hors en-tête).",
+    )
+    lignes_reussies = models.PositiveIntegerField(
+        default=0,
+        help_text="Nombre de produits créés ou mis à jour avec succès.",
+    )
+    lignes_echouees = models.PositiveIntegerField(
+        default=0,
+        help_text="Nombre de lignes en erreur (nom/SKU manquant, prix invalide...).",
+    )
+    rapport = models.JSONField(
+        default=list,
+        blank=True,
+        help_text="Détail ligne par ligne : [{ligne, nom, statut, message}, ...].",
+    )
+    importe_par = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        related_name="imports_produits",
+        null=True,
+        blank=True,
+        help_text="Utilisateur ayant lancé cet import.",
+    )
+
+    class Meta(BaseModel.Meta):
+        verbose_name = "Import de produits"
+        verbose_name_plural = "Imports de produits"
+
+    def __str__(self) -> str:
+        return f"Import #{self.id} ({self.statut})"
+
+    @property
+    def nom_fichier(self) -> str:
+        """Nom du fichier seul (sans le chemin ``imports/produits/...``)."""
+        import os
+
+        return os.path.basename(self.fichier.name) if self.fichier else ""
