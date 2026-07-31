@@ -1,0 +1,130 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Importer des catégories{% endblock %}
+{% block page_title %}Importer des catégories (Excel){% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-3xl space-y-6">
+
+  {% if messages %}
+    <div class="space-y-2">
+      {% for message in messages %}
+        <div class="rounded-lg border border-green-200 bg-green-50 px-4 py-2.5 text-sm text-green-800">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- Upload -->
+  <div class="rounded-xl border border-gray-100 bg-white p-6 shadow-sm sm:p-8">
+    <div class="mb-6">
+      <h2 class="text-lg font-semibold text-gray-900">Importer un fichier Excel</h2>
+      <p class="mt-1 text-sm text-gray-500">
+        Colonnes attendues : <code class="rounded bg-gray-100 px-1 py-0.5 text-xs">nom</code> (obligatoire),
+        <code class="rounded bg-gray-100 px-1 py-0.5 text-xs">parent</code> (nom d'une catégorie déjà présente
+        plus haut dans le fichier, optionnel), <code class="rounded bg-gray-100 px-1 py-0.5 text-xs">actif</code> (optionnel).
+        Le traitement se fait en arrière-plan : le rapport apparaît ci-dessous une fois terminé.
+      </p>
+      <a href="{% url 'products:categorie_import_template' %}"
+         class="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-primary-700 hover:text-primary-900">
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 12m0 0l4.5-4.5M12 12V3" /></svg>
+        Télécharger le modèle Excel
+      </a>
+    </div>
+
+    {% if form.non_field_errors %}
+      <div class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700">
+        {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+      </div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" novalidate class="flex flex-col gap-4 sm:flex-row sm:items-end">
+      {% csrf_token %}
+      <div class="flex-1">
+        <label for="{{ form.fichier.id_for_label }}" class="mb-1.5 block text-sm font-medium text-gray-700">
+          {{ form.fichier.label }}
+        </label>
+        {{ form.fichier }}
+        {% if form.fichier.errors %}
+          <p class="mt-1.5 text-xs text-red-600">{{ form.fichier.errors.0 }}</p>
+        {% endif %}
+      </div>
+      <button type="submit" class="flex shrink-0 items-center justify-center rounded-lg bg-primary-800 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-900 focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:ring-offset-2">
+        Lancer l'import
+      </button>
+    </form>
+  </div>
+
+  <!-- Historique / rapport -->
+  <div class="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
+    <div class="border-b border-gray-100 px-4 py-3 sm:px-6">
+      <h2 class="text-sm font-semibold text-gray-900">Imports récents</h2>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full min-w-[560px] text-left text-sm">
+        <thead class="border-b border-gray-100 bg-gray-50">
+          <tr>
+            <th scope="col" class="px-4 py-3 font-medium text-gray-500">Fichier</th>
+            <th scope="col" class="px-4 py-3 font-medium text-gray-500">Statut</th>
+            <th scope="col" class="px-4 py-3 font-medium text-gray-500">Réussies / Échouées</th>
+            <th scope="col" class="px-4 py-3 font-medium text-gray-500">Lancé par</th>
+            <th scope="col" class="px-4 py-3 font-medium text-gray-500">Le</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          {% for import_obj in imports %}
+            <tr class="align-top hover:bg-gray-50">
+              <td class="px-4 py-3 text-gray-900">
+                {{ import_obj.nom_fichier }}
+                {% if import_obj.rapport %}
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs font-medium text-primary-700 hover:text-primary-900">
+                      Détail ({{ import_obj.rapport|length }} ligne{{ import_obj.rapport|length|pluralize }})
+                    </summary>
+                    <ul class="mt-2 max-h-48 space-y-1 overflow-y-auto rounded-lg bg-gray-50 p-3 text-xs">
+                      {% for entree in import_obj.rapport %}
+                        <li class="{% if entree.statut == 'erreur' %}text-red-700{% else %}text-gray-600{% endif %}">
+                          {% if entree.ligne %}Ligne {{ entree.ligne }} —{% endif %}
+                          {% if entree.nom %}{{ entree.nom }} :{% endif %}
+                          {{ entree.message }}
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  </details>
+                {% endif %}
+              </td>
+              <td class="px-4 py-3">
+                {% if import_obj.statut == "TERMINE" %}
+                  <span class="inline-flex items-center rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-medium text-green-800">Terminé</span>
+                {% elif import_obj.statut == "EN_COURS" %}
+                  <span class="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-800">En cours</span>
+                {% elif import_obj.statut == "ECHEC" %}
+                  <span class="inline-flex items-center rounded-full bg-red-50 px-2.5 py-0.5 text-xs font-medium text-red-800">Échec</span>
+                {% else %}
+                  <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600">En attente</span>
+                {% endif %}
+              </td>
+              <td class="px-4 py-3 whitespace-nowrap text-gray-500">
+                <span class="text-green-700">{{ import_obj.lignes_reussies }}</span> /
+                <span class="text-red-700">{{ import_obj.lignes_echouees }}</span>
+              </td>
+              <td class="px-4 py-3 text-gray-500">{{ import_obj.importe_par|default:"—" }}</td>
+              <td class="px-4 py-3 whitespace-nowrap text-gray-500">{{ import_obj.created_at|date:"d/m/Y H:i" }}</td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="5" class="px-4 py-10 text-center text-sm text-gray-400">Aucun import pour le moment.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="border-t border-gray-100 px-4 py-3 text-right sm:px-6">
+      <a href="{% url 'products:categorie_import' %}" class="text-xs font-medium text-primary-700 hover:text-primary-900">
+        Actualiser
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

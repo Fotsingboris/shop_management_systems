@@ -1,0 +1,111 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Catégories{% endblock %}
+{% block page_title %}Catégories{% endblock %}
+
+{% block content %}
+<div class="space-y-4">
+
+  {% if messages %}
+    <div class="space-y-2">
+      {% for message in messages %}
+        <div class="rounded-lg border border-green-200 bg-green-50 px-4 py-2.5 text-sm text-green-800">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- Toolbar -->
+  <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <form method="get" class="w-full sm:max-w-xs">
+      <div class="relative">
+        <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
+        </span>
+        <input
+          type="text" name="q" value="{{ q }}" placeholder="Rechercher une catégorie…"
+          class="block w-full rounded-lg border border-gray-300 bg-white py-2 pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600/30"
+        >
+      </div>
+    </form>
+
+    <div class="flex shrink-0 gap-2">
+      <a href="{% url 'products:categorie_import' %}"
+         class="flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50">
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
+        Importer (Excel)
+      </a>
+      <a href="{% url 'products:categorie_create' %}"
+         class="flex items-center justify-center gap-2 rounded-lg bg-primary-800 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-900">
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+        Nouvelle catégorie
+      </a>
+    </div>
+  </div>
+
+  <!-- Datatable : défilement horizontal sur petits écrans plutôt qu'un
+       empilement en cartes, pour garder les colonnes alignées et
+       comparables même sur mobile. -->
+  <div class="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
+    <div class="overflow-x-auto">
+      <table class="w-full min-w-[640px] text-left text-sm">
+        <thead class="border-b border-gray-100 bg-gray-50">
+          <tr>
+            <th scope="col" class="px-4 py-3 font-medium text-gray-500">Nom</th>
+            <th scope="col" class="px-4 py-3 font-medium text-gray-500">Catégorie parente</th>
+            <th scope="col" class="px-4 py-3 font-medium text-gray-500">Statut</th>
+            <th scope="col" class="px-4 py-3 font-medium text-gray-500">Créée le</th>
+            <th scope="col" class="px-4 py-3 text-right font-medium text-gray-500">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          {% for categorie in categories %}
+            <tr class="hover:bg-gray-50">
+              <td class="px-4 py-3 font-medium text-gray-900">{{ categorie.nom }}</td>
+              <td class="px-4 py-3 text-gray-500">
+                {{ categorie.parent.nom|default:"—" }}
+              </td>
+              <td class="px-4 py-3">
+                {% if categorie.actif %}
+                  <span class="inline-flex items-center rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-medium text-green-800">Active</span>
+                {% else %}
+                  <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600">Inactive</span>
+                {% endif %}
+              </td>
+              <td class="px-4 py-3 whitespace-nowrap text-gray-500">{{ categorie.created_at|date:"d/m/Y" }}</td>
+              <td class="px-4 py-3 text-right">
+                <a href="{% url 'products:categorie_update' categorie.pk %}" class="text-primary-700 hover:text-primary-900">Modifier</a>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="5" class="px-4 py-10 text-center text-sm text-gray-400">
+                Aucune catégorie{% if q %} pour « {{ q }} »{% endif %}.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+      <div class="flex flex-col items-center justify-between gap-3 border-t border-gray-100 px-4 py-3 sm:flex-row">
+        <p class="text-xs text-gray-500">
+          Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}
+          ({{ page_obj.paginator.count }} catégorie{{ page_obj.paginator.count|pluralize }})
+        </p>
+        <div class="flex gap-1">
+          {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q }}{% endif %}"
+               class="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50">Précédent</a>
+          {% endif %}
+          {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q }}{% endif %}"
+               class="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50">Suivant</a>
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from general.enums import TransfertStatut
+from general.enums import ImportStatut, TransfertStatut
 from general.models import Agence, BaseModel
 from general.utils import generate_unique_slug
 
@@ -263,3 +263,64 @@ class TransfertStock(BaseModel):
             raise ValidationError(
                 _("L'agence source et l'agence destination doivent être différentes.")
             )
+
+
+class ImportCategories(BaseModel):
+    """Suivi d'un import en masse de catégories via Excel (EF-2.3).
+
+    Traité en arrière-plan par products.tasks.importer_categories : cette
+    fiche est ce que la requête HTTP peut encore consulter une fois la
+    tâche Celery terminée, puisque la réponse HTTP, elle, revient tout de
+    suite après le déclenchement de la tâche.
+    """
+
+    fichier = models.FileField(
+        upload_to="imports/categories/",
+        help_text="Fichier Excel (.xlsx) contenant les catégories à importer.",
+    )
+    statut = models.CharField(
+        max_length=20,
+        choices=ImportStatut.choices,
+        default=ImportStatut.EN_ATTENTE,
+        db_index=True,
+        help_text="Statut courant du traitement.",
+    )
+    total_lignes = models.PositiveIntegerField(
+        default=0,
+        help_text="Nombre de lignes traitées (hors en-tête).",
+    )
+    lignes_reussies = models.PositiveIntegerField(
+        default=0,
+        help_text="Nombre de catégories créées ou mises à jour avec succès.",
+    )
+    lignes_echouees = models.PositiveIntegerField(
+        default=0,
+        help_text="Nombre de lignes en erreur (nom manquant, parent introuvable...).",
+    )
+    rapport = models.JSONField(
+        default=list,
+        blank=True,
+        help_text="Détail ligne par ligne : [{ligne, nom, statut, message}, ...].",
+    )
+    importe_par = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        related_name="imports_categories",
+        null=True,
+        blank=True,
+        help_text="Utilisateur ayant lancé cet import.",
+    )
+
+    class Meta(BaseModel.Meta):
+        verbose_name = "Import de catégories"
+        verbose_name_plural = "Imports de catégories"
+
+    def __str__(self) -> str:
+        return f"Import #{self.id} ({self.statut})"
+
+    @property
+    def nom_fichier(self) -> str:
+        """Nom du fichier seul (sans le chemin ``imports/categories/...``)."""
+        import os
+
+        return os.path.basename(self.fichier.name) if self.fichier else ""

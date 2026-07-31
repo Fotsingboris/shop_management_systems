@@ -168,83 +168,38 @@ CELERY_TIMEZONE = TIME_ZONE
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60  # 30 min ; ajuster selon la durée réelle de vos tâches
 CELERY_RESULT_EXTENDED = True
+CELERY_WORKER_POOL = "solo"  # Windows dev only — billiard's prefork pool doesn't work reliably on Windows.
 
 
-# =============================================================================
-# NOUVEAU — Logging
-# =============================================================================
 LOG_DIR = BASE_DIR / "logs"
 LOG_DIR.mkdir(exist_ok=True)
-
-DJANGO_LOG_LEVEL = config("DJANGO_LOG_LEVEL", "DEBUG" if DEBUG else "INFO")
 
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
+
     "formatters": {
-        "verbose": {
-            "format": "%(asctime)s [%(levelname)s] %(name)s %(module)s.%(funcName)s:%(lineno)d - %(message)s",
-        },
         "simple": {
-            "format": "%(asctime)s [%(levelname)s] %(name)s - %(message)s",
+            "format": "{asctime} [{levelname}] {name} - {message}",
+            "style": "{",
         },
     },
+
     "handlers": {
         "console": {
-            "level": DJANGO_LOG_LEVEL,
             "class": "logging.StreamHandler",
             "formatter": "simple",
         },
+
         "file": {
-            "level": "INFO",
-            "class": "logging.handlers.RotatingFileHandler",
+            "class": "logging.FileHandler",
             "filename": LOG_DIR / "django.log",
-            "maxBytes": 10 * 1024 * 1024,  # 10 Mo
-            "backupCount": 5,
-            "formatter": "verbose",
-        },
-        "file_errors": {
-            "level": "ERROR",
-            "class": "logging.handlers.RotatingFileHandler",
-            "filename": LOG_DIR / "errors.log",
-            "maxBytes": 10 * 1024 * 1024,
-            "backupCount": 5,
-            "formatter": "verbose",
+            "formatter": "simple",
         },
     },
+
     "root": {
         "handlers": ["console", "file"],
         "level": "INFO",
-    },
-    "loggers": {
-        # Logs internes de Django (requêtes, dépréciations...).
-        "django": {
-            "handlers": ["console", "file"],
-            "level": DJANGO_LOG_LEVEL,
-            "propagate": False,
-        },
-        # Erreurs serveur (500) : toujours loguées, même si DJANGO_LOG_LEVEL
-        # est monté à WARNING/ERROR en production.
-        "django.request": {
-            "handlers": ["console", "file_errors"],
-            "level": "ERROR",
-            "propagate": False,
-        },
-        # Logs des workers Celery.
-        "celery": {
-            "handlers": ["console", "file"],
-            "level": "INFO",
-            "propagate": False,
-        },
-        # Logger applicatif commun aux 4 apps du projet. Dans le code :
-        #   import logging
-        #   logger = logging.getLogger("shop.sales")   # ou "shop.products", etc.
-        # Ces loggers enfants n'ont pas besoin d'être déclarés ici : ils
-        # héritent automatiquement des handlers de "shop" par propagation.
-        "shop": {
-            "handlers": ["console", "file"],
-            "level": DJANGO_LOG_LEVEL,
-            "propagate": False,
-        },
     },
 }

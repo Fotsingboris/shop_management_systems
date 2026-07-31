@@ -43,3 +43,16 @@ class ModePaiement(models.TextChoices):
     CARTE = "CARTE", _("Carte bancaire")
     MOBILE_MONEY = "MOBILE_MONEY", _("Mobile money")
     AUTRE = "AUTRE", _("Autre")
+    
+
+class ImportStatut(models.TextChoices):
+    """Statut d'un import en masse (catégories, produits, prix/stocks...).
+ 
+    Un seul enum réutilisable pour tous les imports du projet plutôt qu'un
+    par app (EF-2.3, EF-3.3, EF-4.3 partagent tous ce même cycle de vie).
+    """
+ 
+    EN_ATTENTE = "EN_ATTENTE", _("En attente")
+    EN_COURS = "EN_COURS", _("En cours")
+    TERMINE = "TERMINE", _("Terminé")
+    ECHEC = "ECHEC", _("Échec")
