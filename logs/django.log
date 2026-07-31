@@ -91,3 +91,38 @@
 2026-07-31 22:43:51,969 [INFO] django.utils.autoreload - Watching for file changes with StatReloader
 2026-07-31 22:47:27,014 [INFO] django.utils.autoreload - C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\products\urls.py changed, reloading.
 2026-07-31 22:47:40,286 [INFO] django.utils.autoreload - Watching for file changes with StatReloader
+2026-07-31 23:06:38,684 [INFO] django.utils.autoreload - C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\general\forms.py changed, reloading.
+2026-07-31 23:07:03,774 [INFO] django.utils.autoreload - Watching for file changes with StatReloader
+2026-07-31 23:09:32,647 [INFO] django.utils.autoreload - C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\general\urls.py changed, reloading.
+2026-07-31 23:09:48,503 [INFO] django.utils.autoreload - Watching for file changes with StatReloader
+2026-07-31 23:09:57,812 [INFO] django.utils.autoreload - C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\general\urls.py changed, reloading.
+2026-07-31 23:10:09,589 [INFO] django.utils.autoreload - Watching for file changes with StatReloader
+2026-07-31 23:10:24,280 [INFO] django.utils.autoreload - C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\general\urls.py changed, reloading.
+2026-07-31 23:10:30,701 [INFO] django.utils.autoreload - Watching for file changes with StatReloader
+2026-07-31 23:11:03,648 [INFO] django.utils.autoreload - C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\general\views\agency_views.py changed, reloading.
+2026-07-31 23:11:16,410 [INFO] django.utils.autoreload - Watching for file changes with StatReloader
+2026-07-31 23:11:23,312 [INFO] django.utils.autoreload - C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\general\views\agency_views.py changed, reloading.
+2026-07-31 23:11:29,042 [INFO] django.utils.autoreload - Watching for file changes with StatReloader
+2026-07-31 23:13:09,401 [INFO] django.utils.autoreload - C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\general\views\agency_views.py changed, reloading.
+2026-07-31 23:13:23,528 [INFO] django.utils.autoreload - Watching for file changes with StatReloader
+2026-07-31 23:13:34,632 [INFO] django.utils.autoreload - C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\general\views\agency_views.py changed, reloading.
+2026-07-31 23:13:43,418 [INFO] django.utils.autoreload - Watching for file changes with StatReloader
+2026-07-31 23:15:29,818 [ERROR] django.request - Internal Server Error: /generalagences/4805fc7d-d61f-45d1-8524-0332fcb600b3/modifier/
+Traceback (most recent call last):
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\core\handlers\base.py", line 220, in _get_response
+    response = response.render()
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\template\response.py", line 114, in render
+    self.content = self.rendered_content
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\template\response.py", line 90, in rendered_content
+    template = self.resolve_template(self.template_name)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\template\response.py", line 72, in resolve_template
+    return select_template(template, using=self.using)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\template\loader.py", line 47, in select_template
+    raise TemplateDoesNotExist(", ".join(template_name_list), chain=chain)
+django.template.exceptions.TemplateDoesNotExist: general/agence_form.html
+2026-07-31 23:15:59,795 [INFO] django.utils.autoreload - C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\general\views\agency_views.py changed, reloading.
+2026-07-31 23:16:15,231 [INFO] django.utils.autoreload - Watching for file changes with StatReloader
+2026-07-31 23:21:22,012 [INFO] django.utils.autoreload - C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\general\urls.py changed, reloading.
+2026-07-31 23:21:49,314 [INFO] django.utils.autoreload - Watching for file changes with StatReloader

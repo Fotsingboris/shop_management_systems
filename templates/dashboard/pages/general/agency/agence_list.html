@@ -1,0 +1,107 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Agences{% endblock %}
+{% block page_title %}Agences{% endblock %}
+
+{% block content %}
+<div class="space-y-4">
+
+  {% if messages %}
+    <div class="space-y-2">
+      {% for message in messages %}
+        <div class="rounded-lg border border-green-200 bg-green-50 px-4 py-2.5 text-sm text-green-800">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- Toolbar -->
+  <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <form method="get" class="w-full sm:max-w-xs">
+      <div class="relative">
+        <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
+        </span>
+        <input
+          type="text" name="q" value="{{ q }}" placeholder="Rechercher une agence…"
+          class="block w-full rounded-lg border border-gray-300 bg-white py-2 pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600/30"
+        >
+      </div>
+    </form>
+
+    <div class="flex shrink-0 gap-2">
+      <a href="{% url 'general:agence_create' %}"
+         class="flex items-center justify-center gap-2 rounded-lg bg-primary-800 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-900">
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+        Nouvelle agence
+      </a>
+    </div>
+  </div>
+
+  <!-- Datatable : défilement horizontal sur petits écrans plutôt qu'un
+       empilement en cartes, pour garder les colonnes alignées et
+       comparables même sur mobile. -->
+  <div class="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
+    <div class="overflow-x-auto">
+      <table class="w-full min-w-[720px] text-left text-sm">
+        <thead class="border-b border-gray-100 bg-gray-50">
+          <tr>
+            <th scope="col" class="px-4 py-3 font-medium text-gray-500">Nom</th>
+            <th scope="col" class="px-4 py-3 font-medium text-gray-500">Adresse</th>
+            <th scope="col" class="px-4 py-3 font-medium text-gray-500">Téléphone</th>
+            <th scope="col" class="px-4 py-3 text-right font-medium text-gray-500">Personnel</th>
+            <th scope="col" class="px-4 py-3 font-medium text-gray-500">Statut</th>
+            <th scope="col" class="px-4 py-3 text-right font-medium text-gray-500">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          {% for agence in agences %}
+            <tr class="hover:bg-gray-50">
+              <td class="px-4 py-3 font-medium text-gray-900">{{ agence.nom }}</td>
+              <td class="px-4 py-3 text-gray-500">{{ agence.adresse|default:"—" }}</td>
+              <td class="px-4 py-3 text-gray-500">{{ agence.telephone|default:"—" }}</td>
+              <td class="px-4 py-3 text-right text-gray-500">{{ agence.nombre_utilisateurs }}</td>
+              <td class="px-4 py-3">
+                {% if agence.actif %}
+                  <span class="inline-flex items-center rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-medium text-green-800">Active</span>
+                {% else %}
+                  <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600">Inactive</span>
+                {% endif %}
+              </td>
+              <td class="px-4 py-3 text-right">
+                <a href="{% url 'general:agence_dashboard' agence.slug %}" class="mr-3 text-gray-500 hover:text-gray-800">Tableau de bord</a>
+                <a href="{% url 'general:agence_update' agence.slug %}" class="text-primary-700 hover:text-primary-900">Modifier</a>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="6" class="px-4 py-10 text-center text-sm text-gray-400">
+                Aucune agence{% if q %} pour « {{ q }} »{% endif %}.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+      <div class="flex flex-col items-center justify-between gap-3 border-t border-gray-100 px-4 py-3 sm:flex-row">
+        <p class="text-xs text-gray-500">
+          Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}
+          ({{ page_obj.paginator.count }} agence{{ page_obj.paginator.count|pluralize }})
+        </p>
+        <div class="flex gap-1">
+          {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q }}{% endif %}"
+               class="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50">Précédent</a>
+          {% endif %}
+          {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q }}{% endif %}"
+               class="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50">Suivant</a>
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

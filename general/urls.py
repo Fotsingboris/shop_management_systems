@@ -8,6 +8,7 @@ from __future__ import annotations
 from django.urls import path
 
 from general.views.admin_dashboard import AdminDashboardView, AgenceDashboardView, ParametresEntrepriseUpdateView
+from general.views import agency_views as views
 
 app_name = "general"
 
@@ -19,4 +20,9 @@ urlpatterns = [
         name="agence_dashboard",
     ),
     path("parametres/", ParametresEntrepriseUpdateView.as_view(), name="parametres"),
+    
+    # anagecy
+    path("agences/", views.AgenceListView.as_view(), name="agence_list"),
+    path("agences/nouvelle/", views.AgenceCreateView.as_view(), name="agence_create"),
+    path("agences/<slug:slug>/modifier/", views.AgenceUpdateView.as_view(), name="agence_update")
 ]
