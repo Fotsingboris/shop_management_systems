@@ -12,6 +12,7 @@ from django.urls import path
 
 from products.views import category_views, product_views
 from products.views.stock_views import StockPriceCreateView, ProduitRechercheApiView, StockListView, StockUpdateView
+from products.views.transfer_views import TransfertCreateView, TransfertListView, TransfertProduitRechercheApiView
 
 app_name = "products"
 
@@ -53,5 +54,15 @@ urlpatterns = [
         "stock/recherche-produits/",
         ProduitRechercheApiView.as_view(),
         name="stock_produit_recherche",
+    ),
+    
+    # Transferts de stock entre agences
+    path("transferts/", TransfertListView.as_view(), name="transfert_list"),
+    path("transferts/nouveau/", TransfertCreateView.as_view(), name="transfert_create"),
+
+    path(
+        "transferts/recherche-produits/",
+        TransfertProduitRechercheApiView.as_view(),
+        name="transfert_produit_recherche",
     ),
 ]

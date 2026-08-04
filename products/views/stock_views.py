@@ -6,10 +6,11 @@ votre convention actuelle (un fichier de vues par fonctionnalité).
 Contrairement aux CRUD Catégorie/Produit, cette page n'est PAS réservée à
 l'Admin : un Responsable d'agence doit pouvoir configurer le stock/prix de
 SA propre agence (EF-9.3), mais pas des autres. ``get_agences_autorisees``
-centralise cette règle et est utilisée à la fois pour l'affichage (GET) et
-pour la revalidation côté serveur (POST) — on ne fait jamais confiance à
-l'agence envoyée par le client, même si le formulaire ne montre que les
-agences autorisées.
+(dans ``products.services``, pour être réutilisable par ``forms.py`` sans
+import circulaire) centralise cette règle et est utilisée à la fois pour
+l'affichage (GET) et pour la revalidation côté serveur (POST) — on ne fait
+jamais confiance à l'agence envoyée par le client, même si le formulaire
+ne montre que les agences autorisées.
 """
 from __future__ import annotations
 
@@ -26,9 +27,9 @@ from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import ListView, TemplateView
 
-from general.models import Agence
 from products.forms import StockAjustementForm
 from products.models import Produit, ProduitAgence
+from products.services import get_agences_autorisees, get_agences_visibles
 
 
 class StockAccessMixin(UserPassesTestMixin):
@@ -37,35 +38,6 @@ class StockAccessMixin(UserPassesTestMixin):
     def test_func(self) -> bool:
         user = self.request.user
         return getattr(user, "is_admin", False) or getattr(user, "is_responsable_agence", False)
-
-
-def get_agences_autorisees(user) -> QuerySet[Agence]:
-    """Agences actives que ``user`` a le droit de configurer.
-
-    Admin : toutes les agences actives. Responsable d'agence : uniquement
-    la sienne (et seulement si elle est active). Tout autre cas (Caissier,
-    Responsable sans agence) : aucune.
-    """
-    if getattr(user, "is_admin", False):
-        return Agence.objects.filter(actif=True).order_by("nom")
-    if getattr(user, "is_responsable_agence", False) and user.agence_id:
-        return Agence.objects.filter(pk=user.agence_id, actif=True)
-    return Agence.objects.none()
-
-
-def get_agences_visibles(user) -> QuerySet[Agence]:
-    """Agences dont ``user`` peut CONSULTER le stock/prix, pour la liste (EF-1.3, EF-13.3).
-
-    Différent de ``get_agences_autorisees()`` (qui ne sert qu'à choisir où
-    AJOUTER du stock, donc uniquement des agences actives) : une agence
-    désactivée "reste visible dans l'historique et les rapports" (EF-1.3),
-    donc la liste ne filtre pas sur ``actif``.
-    """
-    if getattr(user, "is_admin", False):
-        return Agence.objects.all()
-    if getattr(user, "is_responsable_agence", False) and user.agence_id:
-        return Agence.objects.filter(pk=user.agence_id)
-    return Agence.objects.none()
 
 
 def _to_int(value: Any) -> Optional[int]:

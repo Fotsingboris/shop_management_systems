@@ -1,0 +1,351 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Transferts de stock{% endblock %}
+{% block page_title %}Transferts de stock entre agences{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-3xl space-y-6">
+
+  {% if messages %}
+    <div class="space-y-2">
+      {% for message in messages %}
+        <div class="rounded-lg border px-4 py-2.5 text-sm
+          {% if message.tags == 'success' %}border-green-200 bg-green-50 text-green-800
+          {% elif message.tags == 'warning' %}border-amber-200 bg-amber-50 text-amber-800
+          {% elif message.tags == 'error' %}border-red-200 bg-red-50 text-red-700
+          {% else %}border-blue-200 bg-blue-50 text-blue-800{% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- Formulaire -->
+  <div class="rounded-xl border border-gray-100 bg-white p-6 shadow-sm sm:p-8">
+    <div class="mb-6">
+      <h2 class="text-lg font-semibold text-gray-900">Nouveau transfert</h2>
+      <p class="mt-1 text-sm text-gray-500">
+        Choisissez d'abord l'agence source : seuls les produits réellement en stock dans cette agence
+        pourront être recherchés et ajoutés. Chaque produit ajouté se transfère immédiatement à
+        l'enregistrement — la quantité est déduite de la source et ajoutée à la destination (sa fiche
+        stock/prix y est créée automatiquement si le produit n'y est pas encore enregistré).
+      </p>
+    </div>
+
+    {% if form.non_field_errors %}
+      <div class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700">
+        {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+      </div>
+    {% endif %}
+
+    {% if not a_une_agence_source %}
+      <div class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+        Aucune agence source disponible pour votre compte. Contactez un administrateur si vous pensez
+        que c'est une erreur.
+      </div>
+    {% else %}
+      <form method="post" id="transfert-form" novalidate>
+        {% csrf_token %}
+        <input type="hidden" name="entries_json" id="entries-json-input" value="[]">
+
+        <!-- Agences -->
+        <div class="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
+          {% for field in form %}
+            <div>
+              <label for="{{ field.id_for_label }}" class="mb-1.5 block text-sm font-medium text-gray-700">
+                {{ field.label }}
+              </label>
+              {{ field }}
+              {% if field.help_text %}
+                <p class="mt-1.5 text-xs text-gray-400">{{ field.help_text }}</p>
+              {% endif %}
+              {% if field.errors %}
+                <p class="mt-1.5 text-xs text-red-600">{{ field.errors.0 }}</p>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+
+        <!-- Recherche de produits (limitée à l'agence source choisie) -->
+        <div class="relative mt-5">
+          <label for="transfert-search-input" class="mb-1.5 block text-sm font-medium text-gray-700">
+            Ajouter un produit
+          </label>
+          <div class="relative">
+            <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
+            </span>
+            <input type="text" id="transfert-search-input" autocomplete="off" disabled
+              placeholder="Choisissez d'abord une agence source…"
+              class="block w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600/30 disabled:bg-gray-50 disabled:text-gray-400">
+          </div>
+          <div id="transfert-search-results"
+            class="absolute z-10 mt-1 hidden max-h-72 w-full overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg"></div>
+        </div>
+
+        <!-- Produits sélectionnés -->
+        <div class="mt-4">
+          <div id="transfert-form-error" class="mb-3 hidden rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700"></div>
+          <div id="transfert-empty-state" class="rounded-lg border border-dashed border-gray-200 px-4 py-10 text-center text-sm text-gray-400">
+            Aucun produit sélectionné pour l'instant.
+          </div>
+          <div id="transfert-selection" class="space-y-2"></div>
+        </div>
+
+        <div class="mt-6 flex items-center gap-3 border-t border-gray-100 pt-5">
+          <button type="submit" class="flex items-center justify-center rounded-lg bg-primary-800 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-900 focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:ring-offset-2">
+            Transférer
+          </button>
+          <a href="{% url 'products:transfert_list' %}" class="text-sm font-medium text-gray-600 hover:text-gray-900">Annuler</a>
+        </div>
+      </form>
+    {% endif %}
+  </div>
+
+  <!-- Historique récent -->
+  <div class="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
+    <div class="flex items-center justify-between border-b border-gray-100 px-4 py-3 sm:px-6">
+      <h2 class="text-sm font-semibold text-gray-900">Transferts récents</h2>
+      <a href="{% url 'products:transfert_list' %}" class="text-xs font-medium text-primary-700 hover:text-primary-900">
+        Voir tout l'historique →
+      </a>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full min-w-[640px] text-left text-sm">
+        <thead class="border-b border-gray-100 bg-gray-50">
+          <tr>
+            <th scope="col" class="px-4 py-3 font-medium text-gray-500">Produit</th>
+            <th scope="col" class="px-4 py-3 font-medium text-gray-500">De</th>
+            <th scope="col" class="px-4 py-3 font-medium text-gray-500">Vers</th>
+            <th scope="col" class="px-4 py-3 text-right font-medium text-gray-500">Quantité</th>
+            <th scope="col" class="px-4 py-3 font-medium text-gray-500">Par</th>
+            <th scope="col" class="px-4 py-3 font-medium text-gray-500">Le</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          {% for transfert in transferts %}
+            <tr class="hover:bg-gray-50">
+              <td class="px-4 py-3 font-medium text-gray-900">{{ transfert.produit.nom }}</td>
+              <td class="px-4 py-3 text-gray-500">{{ transfert.agence_source.nom }}</td>
+              <td class="px-4 py-3 text-gray-500">{{ transfert.agence_destination.nom }}</td>
+              <td class="px-4 py-3 text-right text-gray-500">{{ transfert.quantite }}</td>
+              <td class="px-4 py-3 text-gray-500">{{ transfert.demande_par|default:"—" }}</td>
+              <td class="px-4 py-3 whitespace-nowrap text-gray-500">{{ transfert.date_transfert|date:"d/m/Y H:i" }}</td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="6" class="px-4 py-10 text-center text-sm text-gray-400">Aucun transfert pour le moment.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% if a_une_agence_source %}
+<script>
+(function () {
+  const SEARCH_URL = "{% url 'products:transfert_produit_recherche' %}";
+
+  const sourceSelect = document.getElementById("{{ form.agence_source.id_for_label }}");
+  const destinationSelect = document.getElementById("{{ form.agence_destination.id_for_label }}");
+  const searchInput = document.getElementById("transfert-search-input");
+  const resultsBox = document.getElementById("transfert-search-results");
+  const selectionBox = document.getElementById("transfert-selection");
+  const emptyState = document.getElementById("transfert-empty-state");
+  const entriesInput = document.getElementById("entries-json-input");
+  const form = document.getElementById("transfert-form");
+  const errorBox = document.getElementById("transfert-form-error");
+
+  // produit_id -> { nom, sku, stock_disponible, quantite }
+  let selection = {};
+  let debounceTimer = null;
+
+  function escapeHtml(value) {
+    return String(value == null ? "" : value).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  function resetSelection() {
+    selection = {};
+    renderSelection();
+  }
+
+  // L'agence destination ne peut pas être la même que la source : on
+  // désactive l'option correspondante côté client (la vraie garde-fou
+  // reste la validation serveur du formulaire).
+  function syncDestinationOptions() {
+    const sourceValue = sourceSelect.value;
+    Array.prototype.forEach.call(destinationSelect.options, function (option) {
+      if (!option.value) return;
+      const doitDesactiver = option.value === sourceValue;
+      option.disabled = doitDesactiver;
+      if (doitDesactiver && destinationSelect.value === option.value) {
+        destinationSelect.value = "";
+      }
+    });
+  }
+
+  function updateSearchAvailability() {
+    const hasSource = !!sourceSelect.value;
+    searchInput.disabled = !hasSource;
+    searchInput.placeholder = hasSource
+      ? "Nom ou SKU du produit…"
+      : "Choisissez d'abord une agence source…";
+    if (!hasSource) {
+      resultsBox.classList.add("hidden");
+      resultsBox.innerHTML = "";
+    }
+  }
+
+  sourceSelect.addEventListener("change", function () {
+    resetSelection();
+    searchInput.value = "";
+    updateSearchAvailability();
+    syncDestinationOptions();
+  });
+  destinationSelect.addEventListener("change", syncDestinationOptions);
+
+  updateSearchAvailability();
+  syncDestinationOptions();
+  // S'il n'y a qu'une seule agence source possible (cas fréquent d'un
+  // Responsable d'agence), on la sélectionne directement pour éviter une
+  // étape inutile.
+  if (!sourceSelect.value) {
+    const optionsReelles = Array.prototype.filter.call(sourceSelect.options, function (o) { return o.value; });
+    if (optionsReelles.length === 1) {
+      sourceSelect.value = optionsReelles[0].value;
+      sourceSelect.dispatchEvent(new Event("change"));
+    }
+  }
+
+  searchInput.addEventListener("input", function () {
+    clearTimeout(debounceTimer);
+    const q = searchInput.value.trim();
+    if (!sourceSelect.value) return;
+    if (!q) {
+      resultsBox.classList.add("hidden");
+      resultsBox.innerHTML = "";
+      return;
+    }
+    debounceTimer = setTimeout(function () { runSearch(q); }, 300);
+  });
+
+  function runSearch(q) {
+    const params = new URLSearchParams({ agence_id: sourceSelect.value, q: q });
+    fetch(SEARCH_URL + "?" + params.toString(), { headers: { "X-Requested-With": "XMLHttpRequest" } })
+      .then(function (r) { return r.json(); })
+      .then(function (data) { renderResults(data.results || []); })
+      .catch(function () { resultsBox.classList.add("hidden"); });
+  }
+
+  function renderResults(results) {
+    if (!results.length) {
+      resultsBox.innerHTML = '<div class="px-4 py-3 text-sm text-gray-400">Aucun produit disponible dans cette agence pour cette recherche.</div>';
+      resultsBox.classList.remove("hidden");
+      return;
+    }
+    resultsBox.innerHTML = results.map(function (p) {
+      return (
+        '<button type="button" class="transfert-result-item flex w-full items-center justify-between px-4 py-2.5 text-left text-sm hover:bg-gray-50" ' +
+        'data-id="' + escapeHtml(p.produit_id) + '" data-nom="' + escapeHtml(p.nom) + '" data-sku="' + escapeHtml(p.sku) + '" ' +
+        'data-stock="' + escapeHtml(p.stock_disponible) + '">' +
+        '<span class="font-medium text-gray-900">' + escapeHtml(p.nom) + '</span>' +
+        '<span class="text-gray-400">' + escapeHtml(p.sku) + ' · disponible : ' + escapeHtml(p.stock_disponible) + '</span>' +
+        '</button>'
+      );
+    }).join("");
+    resultsBox.classList.remove("hidden");
+    resultsBox.querySelectorAll(".transfert-result-item").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        addProduit({
+          id: btn.dataset.id,
+          nom: btn.dataset.nom,
+          sku: btn.dataset.sku,
+          stock_disponible: parseInt(btn.dataset.stock, 10) || 0,
+        });
+        resultsBox.classList.add("hidden");
+        resultsBox.innerHTML = "";
+        searchInput.value = "";
+      });
+    });
+  }
+
+  function addProduit(p) {
+    if (selection[p.id]) return; // déjà dans la liste
+    selection[p.id] = {
+      nom: p.nom,
+      sku: p.sku,
+      stock_disponible: p.stock_disponible,
+      quantite: "",
+    };
+    renderSelection();
+  }
+
+  function removeProduit(id) {
+    delete selection[id];
+    renderSelection();
+  }
+
+  function renderSelection() {
+    const ids = Object.keys(selection);
+    if (!ids.length) {
+      selectionBox.innerHTML = "";
+      emptyState.classList.remove("hidden");
+      return;
+    }
+    emptyState.classList.add("hidden");
+    selectionBox.innerHTML = ids.map(function (id) {
+      const data = selection[id];
+      return (
+        '<div class="grid grid-cols-1 items-center gap-2 rounded-lg border border-gray-100 px-3 py-2 sm:grid-cols-[1fr_auto_auto]">' +
+        '<div><p class="text-sm font-medium text-gray-900">' + escapeHtml(data.nom) + '</p>' +
+        '<p class="text-xs text-gray-400">' + escapeHtml(data.sku) + ' · disponible : ' + escapeHtml(data.stock_disponible) + '</p></div>' +
+        '<input type="number" min="1" max="' + escapeHtml(data.stock_disponible) + '" placeholder="Quantité" value="' + escapeHtml(data.quantite) + '" ' +
+        'data-role="qty" data-produit="' + id + '" ' +
+        'class="block w-full rounded-lg border border-gray-300 bg-white py-1.5 px-2 text-sm focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600/30 sm:w-32">' +
+        '<button type="button" data-role="remove" data-produit="' + id + '" class="text-xs font-medium text-red-600 hover:text-red-800">Retirer</button>' +
+        '</div>'
+      );
+    }).join("");
+
+    selectionBox.querySelectorAll("[data-role='qty']").forEach(function (input) {
+      input.addEventListener("input", function () {
+        selection[input.dataset.produit].quantite = input.value;
+      });
+    });
+    selectionBox.querySelectorAll("[data-role='remove']").forEach(function (btn) {
+      btn.addEventListener("click", function () { removeProduit(btn.dataset.produit); });
+    });
+  }
+
+  form.addEventListener("submit", function (event) {
+    const entries = [];
+    Object.keys(selection).forEach(function (produitId) {
+      const data = selection[produitId];
+      if (data.quantite === "" || data.quantite === null) return;
+      entries.push({ produit_id: produitId, quantite: data.quantite });
+    });
+
+    if (!entries.length) {
+      event.preventDefault();
+      errorBox.textContent = "Ajoutez au moins un produit et renseignez sa quantité.";
+      errorBox.classList.remove("hidden");
+      return;
+    }
+    errorBox.classList.add("hidden");
+    entriesInput.value = JSON.stringify(entries);
+  });
+
+  document.addEventListener("click", function (event) {
+    if (!resultsBox.contains(event.target) && event.target !== searchInput) {
+      resultsBox.classList.add("hidden");
+    }
+  });
+})();
+</script>
+{% endif %}
+{% endblock %}
