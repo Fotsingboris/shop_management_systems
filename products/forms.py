@@ -1,6 +1,7 @@
-"""Formulaires du catalogue produit (EF-2, EF-3)."""
+"""Formulaires du catalogue produit (EF-2, EF-3, EF-4)."""
 from __future__ import annotations
 
+from decimal import Decimal
 from typing import Any
 
 from django import forms
@@ -61,6 +62,38 @@ class CategorieImportForm(_TailwindFormMixin, forms.ModelForm):
         if not fichier.name.lower().endswith((".xlsx", ".xlsm")):
             raise forms.ValidationError("Le fichier doit être un classeur Excel (.xlsx).")
         return fichier
+
+
+class StockAjustementForm(_TailwindFormMixin, forms.Form):
+    """Réapprovisionnement/correction d'une fiche ProduitAgence existante (EF-4.2, EF-4.3, EF-4.4).
+
+    Formulaire simple (pas un ModelForm) car la quantité ne se traite pas
+    comme les autres champs : elle s'AJOUTE au stock actuel plutôt que de
+    le remplacer, pour ne pas obliger à ressaisir le total exact à chaque
+    réappro (« le stock peut être ajouté à tout moment »). Le prix de
+    vente et le seuil d'alerte, eux, sont bien remplacés directement.
+    """
+
+    quantite_a_ajouter = forms.IntegerField(
+        label="Quantité à ajouter",
+        initial=0,
+        help_text="Positif pour un réapprovisionnement, négatif pour corriger une erreur de comptage.",
+    )
+    prix_vente = forms.DecimalField(
+        label="Prix de vente",
+        max_digits=12,
+        decimal_places=2,
+        min_value=Decimal("0.01"),
+    )
+    seuil_alerte = forms.IntegerField(
+        label="Seuil d'alerte",
+        min_value=0,
+        help_text="Stock à partir duquel cette fiche est signalée « Stock bas ».",
+    )
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        self._apply_tailwind()
 
 
 class ProduitForm(_TailwindFormMixin, forms.ModelForm):

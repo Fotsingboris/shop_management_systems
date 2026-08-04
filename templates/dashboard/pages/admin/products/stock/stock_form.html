@@ -1,0 +1,286 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Stock &amp; prix{% endblock %}
+{% block page_title %}Stock &amp; prix par agence{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-4xl space-y-6">
+
+  {% if messages %}
+    <div class="space-y-2">
+      {% for message in messages %}
+        <div class="rounded-lg border px-4 py-2.5 text-sm
+          {% if message.tags == 'success' %}border-green-200 bg-green-50 text-green-800
+          {% elif message.tags == 'warning' %}border-amber-200 bg-amber-50 text-amber-800
+          {% elif message.tags == 'error' %}border-red-200 bg-red-50 text-red-700
+          {% else %}border-blue-200 bg-blue-50 text-blue-800{% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <div class="rounded-xl border border-gray-100 bg-white p-6 shadow-sm sm:p-8">
+    <div class="mb-6">
+      <h2 class="text-lg font-semibold text-gray-900">Ajouter du stock &amp; un prix de vente</h2>
+      <p class="mt-1 text-sm text-gray-500">
+        Recherchez un produit, ajoutez-le à la liste, puis saisissez la quantité et le prix de vente
+        pour chaque agence — le prix peut différer d'une agence à l'autre. Un enregistrement crée
+        toutes les lignes en une seule fois. Cette page sert à initialiser une agence qui n'a pas
+        encore ce produit : une agence déjà configurée pour ce produit affiche un lien « Modifier »
+        vers sa fiche existante à la place (le stock peut être ajouté ou le prix changé à tout moment).
+      </p>
+    </div>
+
+    {% if not agences %}
+      <div class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+        Aucune agence disponible pour votre compte. Contactez un administrateur si vous pensez que
+        c'est une erreur.
+      </div>
+    {% else %}
+
+      <!-- Recherche -->
+      <div class="relative">
+        <label for="stock-search-input" class="mb-1.5 block text-sm font-medium text-gray-700">Rechercher un produit</label>
+        <div class="relative">
+          <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
+          </span>
+          <input type="text" id="stock-search-input" autocomplete="off" placeholder="Nom ou SKU du produit…"
+            class="block w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600/30">
+        </div>
+        <div id="stock-search-results"
+          class="absolute z-10 mt-1 hidden max-h-72 w-full overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg"></div>
+      </div>
+
+      <!-- Liste des produits sélectionnés -->
+      <form method="post" id="stock-form" class="mt-6 space-y-4">
+        {% csrf_token %}
+        <input type="hidden" name="entries_json" id="entries-json-input" value="[]">
+
+        <div id="stock-form-error" class="hidden rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700"></div>
+
+        <div id="stock-empty-state" class="rounded-lg border border-dashed border-gray-200 px-4 py-10 text-center text-sm text-gray-400">
+          Aucun produit sélectionné pour l'instant. Utilisez la recherche ci-dessus.
+        </div>
+
+        <div id="stock-selection" class="space-y-4"></div>
+
+        <div class="flex items-center gap-3 border-t border-gray-100 pt-5">
+          <button type="submit" class="flex items-center justify-center rounded-lg bg-primary-800 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-900 focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:ring-offset-2">
+            Enregistrer
+          </button>
+          <a href="{% url 'products:stock_list' %}" class="text-sm font-medium text-gray-600 hover:text-gray-900">Annuler</a>
+        </div>
+      </form>
+    {% endif %}
+  </div>
+</div>
+
+{% if agences %}
+<script>
+(function () {
+  const AGENCES = {{ agences_json|safe }};
+  const SEARCH_URL = "{% url 'products:stock_produit_recherche' %}";
+  // Gabarit d'URL avec un UUID bidon, remplacé côté client par le vrai id
+  // de la fiche ProduitAgence (pas d'autre façon d'inverser une URL avec
+  // un paramètre dynamique en JS pur, sans framework front).
+  const STOCK_UPDATE_URL_TEMPLATE = "{% url 'products:stock_update' '00000000-0000-0000-0000-000000000000' %}";
+
+  function stockUpdateUrl(stockId) {
+    return STOCK_UPDATE_URL_TEMPLATE.replace("00000000-0000-0000-0000-000000000000", stockId);
+  }
+
+  const searchInput = document.getElementById("stock-search-input");
+  const resultsBox = document.getElementById("stock-search-results");
+  const selectionBox = document.getElementById("stock-selection");
+  const emptyState = document.getElementById("stock-empty-state");
+  const entriesInput = document.getElementById("entries-json-input");
+  const form = document.getElementById("stock-form");
+  const errorBox = document.getElementById("stock-form-error");
+
+  // produit_id -> { nom, sku, agences_configurees: {agence_id: stock_id}, valeurs: { agence_id: {quantite, prix_vente} } }
+  const selection = {};
+  let debounceTimer = null;
+
+  function estConfiguree(data, agenceId) {
+    return Object.prototype.hasOwnProperty.call(data.agences_configurees, agenceId);
+  }
+
+  function escapeHtml(value) {
+    return String(value == null ? "" : value).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  searchInput.addEventListener("input", function () {
+    clearTimeout(debounceTimer);
+    const q = searchInput.value.trim();
+    if (!q) {
+      resultsBox.classList.add("hidden");
+      resultsBox.innerHTML = "";
+      return;
+    }
+    debounceTimer = setTimeout(function () { runSearch(q); }, 300);
+  });
+
+  function runSearch(q) {
+    fetch(SEARCH_URL + "?q=" + encodeURIComponent(q), { headers: { "X-Requested-With": "XMLHttpRequest" } })
+      .then(function (r) { return r.json(); })
+      .then(function (data) { renderResults(data.results || []); })
+      .catch(function () { resultsBox.classList.add("hidden"); });
+  }
+
+  function renderResults(results) {
+    if (!results.length) {
+      resultsBox.innerHTML = '<div class="px-4 py-3 text-sm text-gray-400">Aucun produit trouvé.</div>';
+      resultsBox.classList.remove("hidden");
+      return;
+    }
+    resultsBox.innerHTML = results.map(function (p) {
+      return (
+        '<button type="button" class="stock-result-item flex w-full items-center justify-between px-4 py-2.5 text-left text-sm hover:bg-gray-50" ' +
+        'data-id="' + escapeHtml(p.id) + '" data-nom="' + escapeHtml(p.nom) + '" data-sku="' + escapeHtml(p.sku) + '" ' +
+        'data-prix="' + escapeHtml(p.prix_vente_defaut) + '" data-configurees=\'' + escapeHtml(JSON.stringify(p.agences_configurees)) + '\'>' +
+        '<span class="font-medium text-gray-900">' + escapeHtml(p.nom) + '</span>' +
+        '<span class="text-gray-400">' + escapeHtml(p.sku) + '</span>' +
+        '</button>'
+      );
+    }).join("");
+    resultsBox.classList.remove("hidden");
+    resultsBox.querySelectorAll(".stock-result-item").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        addProduit({
+          id: btn.dataset.id,
+          nom: btn.dataset.nom,
+          sku: btn.dataset.sku,
+          prix_vente_defaut: btn.dataset.prix,
+          agences_configurees: JSON.parse(btn.dataset.configurees || "{}"),
+        });
+        resultsBox.classList.add("hidden");
+        resultsBox.innerHTML = "";
+        searchInput.value = "";
+      });
+    });
+  }
+
+  function addProduit(p) {
+    if (selection[p.id]) return; // déjà dans la liste
+    const valeurs = {};
+    AGENCES.forEach(function (a) {
+      valeurs[a.id] = { quantite: "", prix_vente: p.prix_vente_defaut };
+    });
+    selection[p.id] = {
+      nom: p.nom,
+      sku: p.sku,
+      agences_configurees: p.agences_configurees || {}, // {agence_id: stock_id}
+      valeurs: valeurs,
+    };
+    renderSelection();
+  }
+
+  function removeProduit(id) {
+    delete selection[id];
+    renderSelection();
+  }
+
+  function renderProduitCard(id, data) {
+    const rows = AGENCES.map(function (a) {
+      if (estConfiguree(data, a.id)) {
+        const stockId = data.agences_configurees[a.id];
+        return (
+          '<div class="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50 px-3 py-2">' +
+          '<span class="text-sm text-gray-500">' + escapeHtml(a.nom) + '</span>' +
+          '<a href="' + escapeHtml(stockUpdateUrl(stockId)) + '" class="text-xs font-medium text-primary-700 hover:text-primary-900">' +
+          'Déjà configuré · Modifier</a>' +
+          '</div>'
+        );
+      }
+      const val = data.valeurs[a.id] || { quantite: "", prix_vente: "" };
+      return (
+        '<div class="grid grid-cols-1 items-center gap-2 rounded-lg border border-gray-100 px-3 py-2 sm:grid-cols-3">' +
+        '<span class="text-sm text-gray-700">' + escapeHtml(a.nom) + '</span>' +
+        '<input type="number" min="0" step="1" placeholder="Quantité" value="' + escapeHtml(val.quantite) + '" ' +
+        'data-role="qty" data-produit="' + id + '" data-agence="' + a.id + '" ' +
+        'class="block w-full rounded-lg border border-gray-300 bg-white py-1.5 px-2 text-sm focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600/30">' +
+        '<input type="number" min="0" step="0.01" placeholder="Prix de vente" value="' + escapeHtml(val.prix_vente) + '" ' +
+        'data-role="prix" data-produit="' + id + '" data-agence="' + a.id + '" ' +
+        'class="block w-full rounded-lg border border-gray-300 bg-white py-1.5 px-2 text-sm focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600/30">' +
+        '</div>'
+      );
+    }).join("");
+
+    return (
+      '<div id="stock-card-' + id + '" class="rounded-xl border border-gray-100 bg-white p-4 shadow-sm sm:p-5">' +
+      '<div class="mb-3 flex items-center justify-between">' +
+      '<div><p class="text-sm font-semibold text-gray-900">' + escapeHtml(data.nom) + '</p>' +
+      '<p class="text-xs text-gray-400">' + escapeHtml(data.sku) + '</p></div>' +
+      '<button type="button" data-role="remove" data-produit="' + id + '" class="text-xs font-medium text-red-600 hover:text-red-800">Retirer</button>' +
+      '</div>' +
+      '<div class="space-y-2">' + rows + '</div>' +
+      '</div>'
+    );
+  }
+
+  function renderSelection() {
+    const ids = Object.keys(selection);
+    if (!ids.length) {
+      selectionBox.innerHTML = "";
+      emptyState.classList.remove("hidden");
+      return;
+    }
+    emptyState.classList.add("hidden");
+    selectionBox.innerHTML = ids.map(function (id) { return renderProduitCard(id, selection[id]); }).join("");
+
+    selectionBox.querySelectorAll("[data-role='qty']").forEach(function (input) {
+      input.addEventListener("input", function () {
+        selection[input.dataset.produit].valeurs[input.dataset.agence].quantite = input.value;
+      });
+    });
+    selectionBox.querySelectorAll("[data-role='prix']").forEach(function (input) {
+      input.addEventListener("input", function () {
+        selection[input.dataset.produit].valeurs[input.dataset.agence].prix_vente = input.value;
+      });
+    });
+    selectionBox.querySelectorAll("[data-role='remove']").forEach(function (btn) {
+      btn.addEventListener("click", function () { removeProduit(btn.dataset.produit); });
+    });
+  }
+
+  form.addEventListener("submit", function (event) {
+    const entries = [];
+    Object.keys(selection).forEach(function (produitId) {
+      const data = selection[produitId];
+      AGENCES.forEach(function (a) {
+        if (estConfiguree(data, a.id)) return;
+        const val = data.valeurs[a.id];
+        if (!val) return;
+        if (val.quantite === "" || val.quantite === null || val.prix_vente === "" || val.prix_vente === null) return;
+        entries.push({
+          produit_id: produitId,
+          agence_id: a.id,
+          quantite: val.quantite,
+          prix_vente: val.prix_vente,
+        });
+      });
+    });
+
+    if (!entries.length) {
+      event.preventDefault();
+      errorBox.textContent = "Ajoutez au moins un produit et renseignez quantité et prix pour au moins une agence.";
+      errorBox.classList.remove("hidden");
+      return;
+    }
+    errorBox.classList.add("hidden");
+    entriesInput.value = JSON.stringify(entries);
+  });
+
+  document.addEventListener("click", function (event) {
+    if (!resultsBox.contains(event.target) && event.target !== searchInput) {
+      resultsBox.classList.add("hidden");
+    }
+  });
+})();
+</script>
+{% endif %}
+{% endblock %}

@@ -11,6 +11,7 @@ from __future__ import annotations
 from django.urls import path
 
 from products.views import category_views, product_views
+from products.views.stock_views import StockPriceCreateView, ProduitRechercheApiView, StockListView, StockUpdateView
 
 app_name = "products"
 
@@ -42,5 +43,15 @@ urlpatterns = [
         "produits/import/modele/",
         product_views.ProduitImportTemplateView.as_view(),
         name="produit_import_template",
+    ),
+    # Stock & prix par agence
+    
+    path("stock/", StockListView.as_view(), name="stock_list"),
+    path("stock/ajouter/", StockPriceCreateView.as_view(), name="stock_create"),
+    path("stock/<uuid:pk>/modifier/", StockUpdateView.as_view(), name="stock_update"),
+    path(
+        "stock/recherche-produits/",
+        ProduitRechercheApiView.as_view(),
+        name="stock_produit_recherche",
     ),
 ]

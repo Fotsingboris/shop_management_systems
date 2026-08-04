@@ -1,0 +1,145 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Stock &amp; prix{% endblock %}
+{% block page_title %}Stock &amp; prix par agence{% endblock %}
+
+{% block content %}
+<div class="space-y-4">
+
+  {% if messages %}
+    <div class="space-y-2">
+      {% for message in messages %}
+        <div class="rounded-lg border px-4 py-2.5 text-sm
+          {% if message.tags == 'success' %}border-green-200 bg-green-50 text-green-800
+          {% elif message.tags == 'warning' %}border-amber-200 bg-amber-50 text-amber-800
+          {% elif message.tags == 'error' %}border-red-200 bg-red-50 text-red-700
+          {% else %}border-blue-200 bg-blue-50 text-blue-800{% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- Toolbar -->
+  <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <form method="get" class="flex w-full flex-col gap-3 sm:flex-row sm:items-center">
+      <div class="relative w-full sm:max-w-xs">
+        <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
+        </span>
+        <input
+          type="text" name="q" value="{{ q }}" placeholder="Rechercher un produit ou un SKU…"
+          class="block w-full rounded-lg border border-gray-300 bg-white py-2 pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600/30"
+        >
+      </div>
+
+      {% if agences_visibles|length > 1 %}
+        <select name="agence" onchange="this.form.submit()"
+          class="block w-full rounded-lg border border-gray-300 bg-white py-2 px-3 text-sm text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600/30 sm:w-56">
+          <option value="">Toutes les agences</option>
+          {% for agence in agences_visibles %}
+            <option value="{{ agence.pk }}" {% if agence_id == agence.pk|stringformat:"s" %}selected{% endif %}>{{ agence.nom }}</option>
+          {% endfor %}
+        </select>
+      {% endif %}
+
+      <label class="flex shrink-0 items-center gap-2 text-sm text-gray-600">
+        <input type="checkbox" name="bas" value="1" onchange="this.form.submit()" {% if bas == "1" %}checked{% endif %}
+          class="h-4 w-4 rounded border-gray-300 text-primary-700 focus:ring-primary-600/30">
+        Stock bas uniquement
+      </label>
+      <button type="submit" class="hidden">Filtrer</button>
+    </form>
+
+    <div class="flex shrink-0 gap-2">
+      <a href="{% url 'products:stock_create' %}"
+         class="flex items-center justify-center gap-2 rounded-lg bg-primary-800 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-900">
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+        Ajouter du stock
+      </a>
+    </div>
+  </div>
+
+  <!-- Datatable -->
+  <div class="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
+    <div class="overflow-x-auto">
+      <table class="w-full min-w-[880px] text-left text-sm">
+        <thead class="border-b border-gray-100 bg-gray-50">
+          <tr>
+            <th scope="col" class="px-4 py-3 font-medium text-gray-500">Produit</th>
+            <th scope="col" class="px-4 py-3 font-medium text-gray-500">SKU</th>
+            <th scope="col" class="px-4 py-3 font-medium text-gray-500">Agence</th>
+            <th scope="col" class="px-4 py-3 text-right font-medium text-gray-500">Prix de vente</th>
+            <th scope="col" class="px-4 py-3 text-right font-medium text-gray-500">Stock</th>
+            <th scope="col" class="px-4 py-3 text-right font-medium text-gray-500">Seuil alerte</th>
+            <th scope="col" class="px-4 py-3 font-medium text-gray-500">Statut</th>
+            <th scope="col" class="px-4 py-3 text-right font-medium text-gray-500">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          {% for stock in stocks %}
+            <tr class="hover:bg-gray-50">
+              <td class="px-4 py-3 font-medium text-gray-900">{{ stock.produit.nom }}</td>
+              <td class="px-4 py-3 text-gray-500">{{ stock.produit.sku }}</td>
+              <td class="px-4 py-3 text-gray-500">
+                {{ stock.agence.nom }}
+                {% if not stock.agence.actif %}
+                  <span class="ml-1 inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-medium text-gray-500">Agence inactive</span>
+                {% endif %}
+              </td>
+              <td class="px-4 py-3 text-right text-gray-500">{{ stock.prix_vente }}</td>
+              <td class="px-4 py-3 text-right text-gray-500">{{ stock.stock_quantite }}</td>
+              <td class="px-4 py-3 text-right text-gray-500">{{ stock.seuil_alerte }}</td>
+              <td class="px-4 py-3">
+                <div class="flex flex-wrap gap-1.5">
+                  {% if stock.stock_bas %}
+                    <span class="inline-flex items-center rounded-full bg-red-50 px-2.5 py-0.5 text-xs font-medium text-red-800">Stock bas</span>
+                  {% else %}
+                    <span class="inline-flex items-center rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-medium text-green-800">OK</span>
+                  {% endif %}
+                  {% if not stock.actif %}
+                    <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600">Inactif</span>
+                  {% endif %}
+                </div>
+              </td>
+              <td class="px-4 py-3 text-right">
+                {% if stock.agence.pk|stringformat:"s" in agences_editables_ids %}
+                  <a href="{% url 'products:stock_update' stock.pk %}" class="text-primary-700 hover:text-primary-900">Modifier</a>
+                {% else %}
+                  <span class="text-gray-300">—</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="8" class="px-4 py-10 text-center text-sm text-gray-400">
+                Aucune fiche stock/prix{% if q %} pour « {{ q }} »{% endif %}. Utilisez « Ajouter du stock » pour en créer.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+      <div class="flex flex-col items-center justify-between gap-3 border-t border-gray-100 px-4 py-3 sm:flex-row">
+        <p class="text-xs text-gray-500">
+          Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}
+          ({{ page_obj.paginator.count }} fiche{{ page_obj.paginator.count|pluralize }})
+        </p>
+        <div class="flex gap-1">
+          {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% if agence_id %}&agence={{ agence_id }}{% endif %}{% if bas %}&bas={{ bas }}{% endif %}"
+               class="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50">Précédent</a>
+          {% endif %}
+          {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q }}{% endif %}{% if agence_id %}&agence={{ agence_id }}{% endif %}{% if bas %}&bas={{ bas }}{% endif %}"
+               class="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50">Suivant</a>
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
