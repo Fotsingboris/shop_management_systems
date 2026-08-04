@@ -143,3 +143,22 @@ django.template.exceptions.TemplateDoesNotExist: general/agence_form.html
 2026-08-01 00:07:05,355 [INFO] django.utils.autoreload - Watching for file changes with StatReloader
 2026-08-01 00:07:53,617 [INFO] django.utils.autoreload - C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\products\urls.py changed, reloading.
 2026-08-01 00:08:22,460 [INFO] django.utils.autoreload - Watching for file changes with StatReloader
+2026-08-03 14:07:31,008 [WARNING] django.request - Not Found: /favicon.ico
+2026-08-04 01:21:52,433 [INFO] django.utils.autoreload - C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\products\services.py changed, reloading.
+2026-08-04 01:23:17,112 [INFO] django.utils.autoreload - Watching for file changes with StatReloader
+2026-08-04 01:24:12,095 [INFO] django.utils.autoreload - C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\products\urls.py changed, reloading.
+2026-08-04 01:25:27,985 [INFO] django.utils.autoreload - Watching for file changes with StatReloader
+2026-08-04 01:26:35,490 [INFO] django.utils.autoreload - C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\products\urls.py changed, reloading.
+2026-08-04 01:27:27,078 [INFO] django.utils.autoreload - Watching for file changes with StatReloader
+2026-08-04 01:27:59,427 [INFO] django.utils.autoreload - C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\products\urls.py changed, reloading.
+2026-08-04 01:28:49,122 [INFO] django.utils.autoreload - Watching for file changes with StatReloader
+2026-08-04 01:30:12,633 [INFO] django.utils.autoreload - C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\products\urls.py changed, reloading.
+2026-08-04 01:30:46,520 [INFO] django.utils.autoreload - Watching for file changes with StatReloader
+2026-08-04 01:31:18,712 [INFO] django.utils.autoreload - C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\products\urls.py changed, reloading.
+2026-08-04 01:31:31,768 [INFO] django.utils.autoreload - Watching for file changes with StatReloader
+2026-08-04 01:31:54,420 [INFO] django.utils.autoreload - C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\products\urls.py changed, reloading.
+2026-08-04 01:32:39,394 [INFO] django.utils.autoreload - Watching for file changes with StatReloader
+2026-08-04 01:49:40,590 [INFO] django.utils.autoreload - C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\products\views\transfer_views.py changed, reloading.
+2026-08-04 01:50:33,541 [INFO] django.utils.autoreload - Watching for file changes with StatReloader
+2026-08-04 01:51:15,088 [INFO] django.utils.autoreload - C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\products\views\transfer_views.py changed, reloading.
+2026-08-04 01:51:44,577 [INFO] django.utils.autoreload - Watching for file changes with StatReloader

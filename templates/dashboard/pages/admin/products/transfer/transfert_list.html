@@ -1,0 +1,125 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Transferts de stock{% endblock %}
+{% block page_title %}Transferts de stock entre agences{% endblock %}
+
+{% block content %}
+<div class="space-y-4">
+
+  {% if messages %}
+    <div class="space-y-2">
+      {% for message in messages %}
+        <div class="rounded-lg border px-4 py-2.5 text-sm
+          {% if message.tags == 'success' %}border-green-200 bg-green-50 text-green-800
+          {% elif message.tags == 'warning' %}border-amber-200 bg-amber-50 text-amber-800
+          {% elif message.tags == 'error' %}border-red-200 bg-red-50 text-red-700
+          {% else %}border-blue-200 bg-blue-50 text-blue-800{% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- Toolbar -->
+  <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <form method="get" class="flex w-full flex-col gap-3 sm:flex-row sm:items-center">
+      <div class="relative w-full sm:max-w-xs">
+        <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
+        </span>
+        <input
+          type="text" name="q" value="{{ q }}" placeholder="Rechercher un produit ou un SKU…"
+          class="block w-full rounded-lg border border-gray-300 bg-white py-2 pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600/30"
+        >
+      </div>
+
+      {% if agences_visibles|length > 1 %}
+        <select name="agence" onchange="this.form.submit()"
+          class="block w-full rounded-lg border border-gray-300 bg-white py-2 px-3 text-sm text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600/30 sm:w-56">
+          <option value="">Toutes les agences</option>
+          {% for agence in agences_visibles %}
+            <option value="{{ agence.pk }}" {% if agence_id == agence.pk|stringformat:"s" %}selected{% endif %}>{{ agence.nom }}</option>
+          {% endfor %}
+        </select>
+      {% endif %}
+      <button type="submit" class="hidden">Filtrer</button>
+    </form>
+
+    <div class="flex shrink-0 gap-2">
+      <a href="{% url 'products:transfert_create' %}"
+         class="flex items-center justify-center gap-2 rounded-lg bg-primary-800 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-900">
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+        Nouveau transfert
+      </a>
+    </div>
+  </div>
+
+  <!-- Datatable -->
+  <div class="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
+    <div class="overflow-x-auto">
+      <table class="w-full min-w-[720px] text-left text-sm">
+        <thead class="border-b border-gray-100 bg-gray-50">
+          <tr>
+            <th scope="col" class="px-4 py-3 font-medium text-gray-500">Produit</th>
+            <th scope="col" class="px-4 py-3 font-medium text-gray-500">De</th>
+            <th scope="col" class="px-4 py-3 font-medium text-gray-500">Vers</th>
+            <th scope="col" class="px-4 py-3 text-right font-medium text-gray-500">Quantité</th>
+            <th scope="col" class="px-4 py-3 font-medium text-gray-500">Statut</th>
+            <th scope="col" class="px-4 py-3 font-medium text-gray-500">Par</th>
+            <th scope="col" class="px-4 py-3 font-medium text-gray-500">Le</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          {% for transfert in transferts %}
+            <tr class="hover:bg-gray-50">
+              <td class="px-4 py-3 font-medium text-gray-900">{{ transfert.produit.nom }}</td>
+              <td class="px-4 py-3 text-gray-500">{{ transfert.agence_source.nom }}</td>
+              <td class="px-4 py-3 text-gray-500">{{ transfert.agence_destination.nom }}</td>
+              <td class="px-4 py-3 text-right text-gray-500">{{ transfert.quantite }}</td>
+              <td class="px-4 py-3">
+                {% if transfert.statut == "TERMINE" %}
+                  <span class="inline-flex items-center rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-medium text-green-800">Terminé</span>
+                {% elif transfert.statut == "APPROUVE" %}
+                  <span class="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-800">Approuvé</span>
+                {% elif transfert.statut == "ANNULE" %}
+                  <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600">Annulé</span>
+                {% else %}
+                  <span class="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-800">En attente</span>
+                {% endif %}
+              </td>
+              <td class="px-4 py-3 text-gray-500">{{ transfert.demande_par|default:"—" }}</td>
+              <td class="px-4 py-3 whitespace-nowrap text-gray-500">{{ transfert.created_at|date:"d/m/Y H:i" }}</td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="7" class="px-4 py-10 text-center text-sm text-gray-400">
+                Aucun transfert{% if q %} pour « {{ q }} »{% endif %}. Utilisez « Nouveau transfert » pour en créer un.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+      <div class="flex flex-col items-center justify-between gap-3 border-t border-gray-100 px-4 py-3 sm:flex-row">
+        <p class="text-xs text-gray-500">
+          Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}
+          ({{ page_obj.paginator.count }} transfert{{ page_obj.paginator.count|pluralize }})
+        </p>
+        <div class="flex gap-1">
+          {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% if agence_id %}&agence={{ agence_id }}{% endif %}"
+               class="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50">Précédent</a>
+          {% endif %}
+          {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q }}{% endif %}{% if agence_id %}&agence={{ agence_id }}{% endif %}"
+               class="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50">Suivant</a>
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

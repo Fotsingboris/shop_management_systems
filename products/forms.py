@@ -1,12 +1,14 @@
-"""Formulaires du catalogue produit (EF-2, EF-3, EF-4)."""
+"""Formulaires du catalogue produit (EF-2, EF-3, EF-4, EF-5)."""
 from __future__ import annotations
 
 from decimal import Decimal
-from typing import Any
+from typing import Any, Optional
 
 from django import forms
 
+from general.models import Agence
 from products.models import Categorie, ImportCategories, ImportProduits, Produit
+from products.services import get_agences_autorisees
 
 TAILWIND_INPUT_CLASSES = (
     "block w-full rounded-lg border border-gray-300 bg-white py-2.5 px-3 text-sm "
@@ -62,6 +64,46 @@ class CategorieImportForm(_TailwindFormMixin, forms.ModelForm):
         if not fichier.name.lower().endswith((".xlsx", ".xlsm")):
             raise forms.ValidationError("Le fichier doit être un classeur Excel (.xlsx).")
         return fichier
+
+
+class TransfertStockForm(_TailwindFormMixin, forms.Form):
+    """Choix des agences source/destination d'un transfert de stock (EF-5).
+
+    Les produits transférés (potentiellement plusieurs à la fois) et leurs
+    quantités ne sont PAS des champs de ce formulaire : comme pour
+    StockPriceCreateView, ils sont saisis via une petite interface "panier"
+    en JS et soumis dans un champ caché ``entries_json`` (voir
+    TransfertCreateView.post). Seules les deux agences ont besoin d'une
+    validation Django classique ici.
+
+    ``agence_source`` n'est PAS un champ libre : son queryset est réduit à
+    ``get_agences_autorisees(user)``, donc un Responsable d'agence ne peut
+    tout simplement pas soumettre une autre agence comme source — que ce
+    soit via l'interface ou en modifiant la requête à la main, puisque
+    ModelChoiceField revalide toujours la valeur contre ce queryset côté
+    serveur (EF-9.3).
+    """
+
+    agence_source = forms.ModelChoiceField(queryset=Agence.objects.none(), label="Agence source")
+    agence_destination = forms.ModelChoiceField(
+        queryset=Agence.objects.filter(actif=True).order_by("nom"),
+        label="Agence destination",
+    )
+
+    def __init__(self, *args: Any, user: Optional[Any] = None, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        self.fields["agence_source"].queryset = (
+            get_agences_autorisees(user) if user is not None else Agence.objects.none()
+        )
+        self._apply_tailwind()
+
+    def clean(self):
+        cleaned = super().clean()
+        source = cleaned.get("agence_source")
+        destination = cleaned.get("agence_destination")
+        if source and destination and source.pk == destination.pk:
+            raise forms.ValidationError("L'agence source et l'agence destination doivent être différentes.")
+        return cleaned
 
 
 class StockAjustementForm(_TailwindFormMixin, forms.Form):
