@@ -1,0 +1,86 @@
+<!doctype html>
+{# Gabarit autonome (pas de dashboard/base.html) : rendu par WeasyPrint, pas par un navigateur. #}
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Rapport d'inventaire</title>
+  <style>
+    @page { size: A4 landscape; margin: 14mm 12mm; }
+    body { font-family: "Helvetica Neue", Arial, sans-serif; color: #111827; font-size: 10px; }
+    .en-tete { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #1F2937; padding-bottom: 10px; margin-bottom: 14px; }
+    .entreprise-nom { font-size: 16px; font-weight: 700; margin: 0; }
+    .entreprise-info { color: #6B7280; font-size: 9px; margin: 2px 0 0; }
+    .titre-rapport { text-align: right; }
+    .titre-rapport h1 { font-size: 14px; margin: 0; }
+    .titre-rapport p { color: #6B7280; font-size: 9px; margin: 2px 0 0; }
+    .kpis { display: flex; gap: 10px; margin-bottom: 14px; }
+    .kpi { flex: 1; border: 1px solid #E5E7EB; border-radius: 6px; padding: 8px 10px; }
+    .kpi p.label { color: #6B7280; font-size: 8px; margin: 0 0 2px; text-transform: uppercase; }
+    .kpi p.valeur { font-size: 14px; font-weight: 700; margin: 0; }
+    table { width: 100%; border-collapse: collapse; }
+    th { background: #1F2937; color: #fff; text-align: left; padding: 6px 8px; font-size: 9px; }
+    td { padding: 5px 8px; border-bottom: 1px solid #E5E7EB; font-size: 9px; }
+    tr:nth-child(even) td { background: #F9FAFB; }
+    .pied-page { margin-top: 16px; color: #9CA3AF; font-size: 8px; text-align: center; }
+    .badge-rouge { color: #B91C1C; font-weight: 600; }
+    .badge-vert { color: #15803D; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="en-tete">
+    <div>
+      <p class="entreprise-nom">{{ parametres.nom }}</p>
+      {% if parametres.adresse %}<p class="entreprise-info">{{ parametres.adresse }}</p>{% endif %}
+      {% if parametres.telephone or parametres.email %}
+        <p class="entreprise-info">{{ parametres.telephone }}{% if parametres.telephone and parametres.email %} · {% endif %}{{ parametres.email }}</p>
+      {% endif %}
+    </div>
+    <div class="titre-rapport">
+      <h1>Rapport d'inventaire</h1>
+      <p>Généré le {{ genere_le|date:"d/m/Y à H:i" }} par {{ genere_par.get_full_name|default:genere_par.username }}</p>
+    </div>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi"><p class="label">Références</p><p class="valeur">{{ kpis.nombre_references }}</p></div>
+    <div class="kpi"><p class="label">Unités en stock</p><p class="valeur">{{ kpis.stock_total }}</p></div>
+    <div class="kpi"><p class="label">Valeur du stock</p><p class="valeur">{{ kpis.valeur_stock }} {{ parametres.devise }}</p></div>
+    <div class="kpi"><p class="label">Alertes stock bas</p><p class="valeur">{{ kpis.nombre_alertes }}</p></div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Agence</th>
+        <th>Produit</th>
+        <th>SKU</th>
+        <th>Catégorie</th>
+        <th>Prix de vente</th>
+        <th>Stock</th>
+        <th>Seuil</th>
+        <th>Statut</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for ligne in lignes %}
+        <tr>
+          <td>{{ ligne.agence.nom }}</td>
+          <td>{{ ligne.produit.nom }}</td>
+          <td>{{ ligne.produit.sku }}</td>
+          <td>{{ ligne.produit.categorie.nom }}</td>
+          <td>{{ ligne.prix_vente }} {{ parametres.devise }}</td>
+          <td>{{ ligne.stock_quantite }}</td>
+          <td>{{ ligne.seuil_alerte }}</td>
+          <td class="{% if ligne.stock_bas %}badge-rouge{% else %}badge-vert{% endif %}">
+            {% if ligne.stock_bas %}Stock bas{% else %}OK{% endif %}
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="8">Aucune ligne de stock pour ces filtres.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <p class="pied-page">{{ parametres.nom }}{% if parametres.tax_id %} · {{ parametres.tax_id }}{% endif %}</p>
+</body>
+</html>
