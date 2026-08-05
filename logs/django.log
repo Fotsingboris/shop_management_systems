@@ -669,3 +669,4 @@ Traceback (most recent call last):
 redis.exceptions.ConnectionError: Error 10061 connecting to 127.0.0.1:6379. Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée.
 2026-08-05 09:57:56,022 [WARNING] django.request - Not Found: /favicon.ico
 2026-08-05 09:58:26,104 [WARNING] django.request - Not Found: /favicon.ico
+2026-08-05 11:11:38,777 [INFO] django.utils.autoreload - Watching for file changes with StatReloader

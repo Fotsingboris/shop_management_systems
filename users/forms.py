@@ -1,4 +1,4 @@
-"""Formulaires d'authentification et de création de compte (EF-9)."""
+"""Formulaires d'authentification et de gestion des comptes (EF-9)."""
 from __future__ import annotations
 
 from typing import Any, Optional
@@ -64,6 +64,52 @@ class UtilisateurCreationForm(UserCreationForm):
         if self.created_by is not None and self.created_by.is_responsable_agence:
             cleaned["role"] = Role.CAISSIER
             cleaned["agence"] = self.created_by.agence
+
+        role = cleaned.get("role")
+        agence = cleaned.get("agence")
+        if role and role != Role.ADMIN and agence is None:
+            self.add_error("agence", _("Une agence est obligatoire pour ce rôle (EF-9.3, EF-9.4)."))
+
+        return cleaned
+
+
+class UtilisateurUpdateForm(forms.ModelForm):
+    """Édition d'un compte existant (EF-9) : identité, rôle et agence — jamais le mot de passe.
+
+    Un changement de mot de passe est volontairement hors périmètre de ce
+    formulaire (action distincte et sensible) : cette page ne gère que la
+    fiche employé (nom, contact, rôle, agence, activation).
+
+    Même verrouillage rôle/agence qu'à la création pour un Responsable
+    d'agence qui modifie l'un de ses Caissiers : il ne peut ni changer son
+    rôle, ni le déplacer vers une autre agence (EF-9.3). Un Admin, lui,
+    modifie librement n'importe quel champ.
+    """
+
+    class Meta:
+        model = Utilisateur
+        fields = ("username", "first_name", "last_name", "email", "telephone", "role", "agence")
+
+    def __init__(self, *args: Any, editeur: Optional[Utilisateur] = None, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        self.editeur = editeur
+
+        for field in self.fields.values():
+            existing = field.widget.attrs.get("class", "")
+            field.widget.attrs["class"] = f"{existing} {TAILWIND_INPUT_CLASSES}".strip()
+
+        if editeur is not None and editeur.is_responsable_agence:
+            self.fields["role"].choices = [(Role.CAISSIER.value, Role.CAISSIER.label)]
+            self.fields["role"].disabled = True
+            self.fields["agence"].disabled = True
+            self.fields["agence"].widget = forms.HiddenInput()
+
+    def clean(self) -> dict[str, Any]:
+        cleaned = super().clean()
+
+        if self.editeur is not None and self.editeur.is_responsable_agence:
+            cleaned["role"] = Role.CAISSIER
+            cleaned["agence"] = self.editeur.agence
 
         role = cleaned.get("role")
         agence = cleaned.get("agence")

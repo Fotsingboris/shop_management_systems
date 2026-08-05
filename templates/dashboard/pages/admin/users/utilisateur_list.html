@@ -1,0 +1,423 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Utilisateurs{% endblock %}
+{% block page_title %}Utilisateurs{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+  {% if messages %}
+    <div class="space-y-2">
+      {% for message in messages %}
+        <div class="rounded-lg border px-4 py-2.5 text-sm
+          {% if message.tags == 'success' %}border-green-200 bg-green-50 text-green-800
+          {% elif message.tags == 'warning' %}border-amber-200 bg-amber-50 text-amber-800
+          {% elif message.tags == 'error' %}border-red-200 bg-red-50 text-red-700
+          {% else %}border-blue-200 bg-blue-50 text-blue-800{% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <h2 class="text-lg font-semibold text-gray-900">Utilisateurs</h2>
+      <p class="mt-1 text-sm text-gray-500">
+        {% if est_admin %}Comptes Admin, Responsables d'agence et Caissiers.{% else %}Caissiers de votre agence.{% endif %}
+      </p>
+    </div>
+    <button type="button" id="btn-ouvrir-creation"
+      class="flex items-center gap-2 rounded-lg bg-primary-800 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-900">
+      <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+      Nouvel utilisateur
+    </button>
+  </div>
+
+  <!-- Filtres -->
+  <form method="get" class="flex flex-wrap items-end gap-3 rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
+    <div class="min-w-[200px] flex-1">
+      <label for="q" class="mb-1.5 block text-xs font-medium text-gray-500">Recherche</label>
+      <input type="text" id="q" name="q" value="{{ q }}" placeholder="Nom, identifiant, email…"
+        class="block w-full rounded-lg border border-gray-300 bg-white py-2 px-3 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600/30">
+    </div>
+    {% if est_admin %}
+      <div class="min-w-[160px]">
+        <label for="role" class="mb-1.5 block text-xs font-medium text-gray-500">Rôle</label>
+        <select id="role" name="role"
+          class="block w-full rounded-lg border border-gray-300 bg-white py-2 px-3 text-sm text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600/30">
+          <option value="">Tous</option>
+          {% for value, label in role_choices %}
+            <option value="{{ value }}" {% if role == value %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="min-w-[160px]">
+        <label for="agence" class="mb-1.5 block text-xs font-medium text-gray-500">Agence</label>
+        <select id="agence" name="agence"
+          class="block w-full rounded-lg border border-gray-300 bg-white py-2 px-3 text-sm text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600/30">
+          <option value="">Toutes</option>
+          {% for a in agences %}
+            <option value="{{ a.pk }}" {% if agence_id == a.pk|stringformat:"s" %}selected{% endif %}>{{ a.nom }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    {% endif %}
+    <div class="min-w-[140px]">
+      <label for="statut" class="mb-1.5 block text-xs font-medium text-gray-500">Statut</label>
+      <select id="statut" name="statut"
+        class="block w-full rounded-lg border border-gray-300 bg-white py-2 px-3 text-sm text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600/30">
+        <option value="">Tous</option>
+        <option value="actif" {% if statut == "actif" %}selected{% endif %}>Actif</option>
+        <option value="inactif" {% if statut == "inactif" %}selected{% endif %}>Inactif</option>
+      </select>
+    </div>
+    <div>
+      <button type="submit" class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50">
+        Filtrer
+      </button>
+    </div>
+  </form>
+
+  <!-- Liste -->
+  <div class="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
+    <div class="overflow-x-auto">
+      <table class="w-full min-w-[820px] text-left text-sm">
+        <thead class="border-b border-gray-100 bg-gray-50">
+          <tr>
+            <th class="px-4 py-3 font-medium text-gray-500">Nom</th>
+            <th class="px-4 py-3 font-medium text-gray-500">Identifiant</th>
+            <th class="px-4 py-3 font-medium text-gray-500">Contact</th>
+            <th class="px-4 py-3 font-medium text-gray-500">Rôle</th>
+            <th class="px-4 py-3 font-medium text-gray-500">Agence</th>
+            <th class="px-4 py-3 font-medium text-gray-500">Statut</th>
+            <th class="sticky right-0 bg-gray-50 px-4 py-3 text-right font-medium text-gray-500">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          {% for utilisateur in utilisateurs %}
+            <tr class="group hover:bg-gray-50">
+              <td class="px-4 py-3 font-medium text-gray-900">{{ utilisateur.get_full_name|default:"—" }}</td>
+              <td class="px-4 py-3 font-mono text-xs text-gray-500">{{ utilisateur.username }}</td>
+              <td class="px-4 py-3 text-gray-500">
+                {{ utilisateur.email|default:"—" }}
+                {% if utilisateur.telephone %}<br><span class="text-xs text-gray-400">{{ utilisateur.telephone }}</span>{% endif %}
+              </td>
+              <td class="px-4 py-3">
+                <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium
+                  {% if utilisateur.role == 'ADMIN' %}bg-purple-100 text-purple-800
+                  {% elif utilisateur.role == 'RESPONSABLE_AGENCE' %}bg-blue-100 text-blue-800
+                  {% else %}bg-gray-100 text-gray-700{% endif %}">
+                  {{ utilisateur.get_role_display }}
+                </span>
+              </td>
+              <td class="px-4 py-3 text-gray-500">{{ utilisateur.agence.nom|default:"Toutes agences" }}</td>
+              <td class="px-4 py-3">
+                <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium
+                  {% if utilisateur.is_active %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-500{% endif %}">
+                  {{ utilisateur.is_active|yesno:"Actif,Inactif" }}
+                </span>
+              </td>
+              <td class="sticky right-0 bg-white px-4 py-3 group-hover:bg-gray-50">
+                <div class="flex items-center justify-end gap-1.5">
+                  <button type="button" title="Modifier" class="btn-modifier flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                    data-id="{{ utilisateur.pk }}"
+                    data-username="{{ utilisateur.username }}"
+                    data-first-name="{{ utilisateur.first_name }}"
+                    data-last-name="{{ utilisateur.last_name }}"
+                    data-email="{{ utilisateur.email }}"
+                    data-telephone="{{ utilisateur.telephone }}"
+                    data-role="{{ utilisateur.role }}"
+                    data-agence-id="{{ utilisateur.agence_id|default:'' }}">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" /></svg>
+                  </button>
+
+                  {% if utilisateur.pk == request.user.pk %}
+                    <span class="px-2 text-xs text-gray-300" title="Vous ne pouvez pas modifier votre propre statut">—</span>
+                  {% elif utilisateur.is_active %}
+                    <form method="post" id="form-desactiver-{{ utilisateur.pk }}"
+                      action="{% url 'users:utilisateur_toggle_actif' utilisateur.pk %}">
+                      {% csrf_token %}
+                    </form>
+                    <button type="button" title="Désactiver" data-confirm-action="desactiver" data-confirm-form="form-desactiver-{{ utilisateur.pk }}"
+                      class="flex h-8 w-8 items-center justify-center rounded-lg text-red-500 hover:bg-red-50 hover:text-red-700">
+                      <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M18.36 6.64a9 9 0 11-12.73 0M12 3v9" /></svg>
+                    </button>
+                  {% else %}
+                    <form method="post" action="{% url 'users:utilisateur_toggle_actif' utilisateur.pk %}">
+                      {% csrf_token %}
+                      <button type="submit" title="Activer" class="flex h-8 w-8 items-center justify-center rounded-lg text-green-600 hover:bg-green-50 hover:text-green-700">
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                      </button>
+                    </form>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="7" class="px-4 py-10 text-center text-sm text-gray-400">Aucun utilisateur trouvé.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% if is_paginated %}
+      <div class="flex items-center justify-between border-t border-gray-100 px-4 py-3 text-sm">
+        <p class="text-gray-500">Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}</p>
+        <div class="flex gap-2">
+          {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}&q={{ q }}&role={{ role }}&agence={{ agence_id }}&statut={{ statut }}"
+              class="rounded-lg border border-gray-300 px-3 py-1.5 text-gray-700 hover:bg-gray-50">Précédent</a>
+          {% endif %}
+          {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}&q={{ q }}&role={{ role }}&agence={{ agence_id }}&statut={{ statut }}"
+              class="rounded-lg border border-gray-300 px-3 py-1.5 text-gray-700 hover:bg-gray-50">Suivant</a>
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- ============== Modale : Nouvel utilisateur ============== -->
+<div id="modal-creation" class="fixed inset-0 z-50 hidden items-center justify-center bg-gray-900/40 p-4">
+  <div class="w-full max-w-lg rounded-xl bg-white p-6 shadow-xl">
+    <div class="mb-4 flex items-center justify-between">
+      <h3 class="text-base font-semibold text-gray-900">Nouvel utilisateur</h3>
+      <button type="button" class="btn-fermer-modale text-gray-400 hover:text-gray-600" data-modal="modal-creation">
+        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+      </button>
+    </div>
+    <form method="post" action="{% url 'users:utilisateur_create' %}" class="space-y-4">
+      {% csrf_token %}
+      {% if create_form.non_field_errors %}
+        <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700">
+          {% for error in create_form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+        </div>
+      {% endif %}
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+          <label for="{{ create_form.username.id_for_label }}" class="mb-1.5 block text-sm font-medium text-gray-700">Identifiant</label>
+          {{ create_form.username }}
+          {% if create_form.username.errors %}<p class="mt-1 text-xs text-red-600">{{ create_form.username.errors.0 }}</p>{% endif %}
+        </div>
+        <div>
+          <label for="{{ create_form.email.id_for_label }}" class="mb-1.5 block text-sm font-medium text-gray-700">Email</label>
+          {{ create_form.email }}
+          {% if create_form.email.errors %}<p class="mt-1 text-xs text-red-600">{{ create_form.email.errors.0 }}</p>{% endif %}
+        </div>
+        <div>
+          <label for="{{ create_form.first_name.id_for_label }}" class="mb-1.5 block text-sm font-medium text-gray-700">Prénom</label>
+          {{ create_form.first_name }}
+        </div>
+        <div>
+          <label for="{{ create_form.last_name.id_for_label }}" class="mb-1.5 block text-sm font-medium text-gray-700">Nom</label>
+          {{ create_form.last_name }}
+        </div>
+        <div>
+          <label for="{{ create_form.telephone.id_for_label }}" class="mb-1.5 block text-sm font-medium text-gray-700">Téléphone</label>
+          {{ create_form.telephone }}
+        </div>
+        <div>
+          <label for="{{ create_form.role.id_for_label }}" class="mb-1.5 block text-sm font-medium text-gray-700">Rôle</label>
+          {{ create_form.role }}
+        </div>
+        {% if not create_form.agence.is_hidden %}
+          <div>
+            <label for="{{ create_form.agence.id_for_label }}" class="mb-1.5 block text-sm font-medium text-gray-700">Agence</label>
+            {{ create_form.agence }}
+            {% if create_form.agence.errors %}<p class="mt-1 text-xs text-red-600">{{ create_form.agence.errors.0 }}</p>{% endif %}
+          </div>
+        {% else %}
+          {{ create_form.agence }}
+        {% endif %}
+        <div>
+          <label for="{{ create_form.password1.id_for_label }}" class="mb-1.5 block text-sm font-medium text-gray-700">Mot de passe</label>
+          {{ create_form.password1 }}
+          {% if create_form.password1.errors %}<p class="mt-1 text-xs text-red-600">{{ create_form.password1.errors.0 }}</p>{% endif %}
+        </div>
+        <div>
+          <label for="{{ create_form.password2.id_for_label }}" class="mb-1.5 block text-sm font-medium text-gray-700">Confirmation</label>
+          {{ create_form.password2 }}
+          {% if create_form.password2.errors %}<p class="mt-1 text-xs text-red-600">{{ create_form.password2.errors.0 }}</p>{% endif %}
+        </div>
+      </div>
+      <div class="flex justify-end gap-2 border-t border-gray-100 pt-4">
+        <button type="button" class="btn-fermer-modale rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50" data-modal="modal-creation">
+          Annuler
+        </button>
+        <button type="submit" class="rounded-lg bg-primary-800 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-900">
+          Créer
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ============== Modale : Modifier l'utilisateur ============== -->
+<div id="modal-edition" class="fixed inset-0 z-50 hidden items-center justify-center bg-gray-900/40 p-4">
+  <div class="w-full max-w-lg rounded-xl bg-white p-6 shadow-xl">
+    <div class="mb-4 flex items-center justify-between">
+      <h3 class="text-base font-semibold text-gray-900">Modifier l'utilisateur</h3>
+      <button type="button" class="btn-fermer-modale text-gray-400 hover:text-gray-600" data-modal="modal-edition">
+        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+      </button>
+    </div>
+    <form method="post" id="form-edition" action="" class="space-y-4">
+      {% csrf_token %}
+      {% if update_form.non_field_errors %}
+        <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700">
+          {% for error in update_form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+        </div>
+      {% endif %}
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+          <label for="{{ update_form.username.id_for_label }}" class="mb-1.5 block text-sm font-medium text-gray-700">Identifiant</label>
+          {{ update_form.username }}
+          {% if update_form.username.errors %}<p class="mt-1 text-xs text-red-600">{{ update_form.username.errors.0 }}</p>{% endif %}
+        </div>
+        <div>
+          <label for="{{ update_form.email.id_for_label }}" class="mb-1.5 block text-sm font-medium text-gray-700">Email</label>
+          {{ update_form.email }}
+          {% if update_form.email.errors %}<p class="mt-1 text-xs text-red-600">{{ update_form.email.errors.0 }}</p>{% endif %}
+        </div>
+        <div>
+          <label for="{{ update_form.first_name.id_for_label }}" class="mb-1.5 block text-sm font-medium text-gray-700">Prénom</label>
+          {{ update_form.first_name }}
+        </div>
+        <div>
+          <label for="{{ update_form.last_name.id_for_label }}" class="mb-1.5 block text-sm font-medium text-gray-700">Nom</label>
+          {{ update_form.last_name }}
+        </div>
+        <div>
+          <label for="{{ update_form.telephone.id_for_label }}" class="mb-1.5 block text-sm font-medium text-gray-700">Téléphone</label>
+          {{ update_form.telephone }}
+        </div>
+        <div>
+          <label for="{{ update_form.role.id_for_label }}" class="mb-1.5 block text-sm font-medium text-gray-700">Rôle</label>
+          {{ update_form.role }}
+        </div>
+        {% if not update_form.agence.is_hidden %}
+          <div>
+            <label for="{{ update_form.agence.id_for_label }}" class="mb-1.5 block text-sm font-medium text-gray-700">Agence</label>
+            {{ update_form.agence }}
+            {% if update_form.agence.errors %}<p class="mt-1 text-xs text-red-600">{{ update_form.agence.errors.0 }}</p>{% endif %}
+          </div>
+        {% else %}
+          {{ update_form.agence }}
+        {% endif %}
+      </div>
+      <div class="flex justify-end gap-2 border-t border-gray-100 pt-4">
+        <button type="button" class="btn-fermer-modale rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50" data-modal="modal-edition">
+          Annuler
+        </button>
+        <button type="submit" class="rounded-lg bg-primary-800 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-900">
+          Enregistrer
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ============== Modale de confirmation (désactivation) ============== -->
+<div id="confirm-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-gray-900/40 p-4">
+  <div class="w-full max-w-sm rounded-xl bg-white p-6 shadow-xl">
+    <h3 class="text-base font-semibold text-gray-900">Désactiver ce compte ?</h3>
+    <p class="mt-2 text-sm text-gray-500">La personne ne pourra plus se connecter tant que le compte n'est pas réactivé.</p>
+    <div class="mt-6 flex justify-end gap-2">
+      <button type="button" id="confirm-modal-cancel" class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+        Fermer
+      </button>
+      <button type="button" id="confirm-modal-confirm" class="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700">
+        Désactiver
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  function ouvrirModale(id) {
+    const modal = document.getElementById(id);
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+  }
+  function fermerModale(id) {
+    const modal = document.getElementById(id);
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+  }
+
+  document.getElementById("btn-ouvrir-creation").addEventListener("click", function () {
+    ouvrirModale("modal-creation");
+  });
+
+  document.querySelectorAll(".btn-fermer-modale").forEach(function (btn) {
+    btn.addEventListener("click", function () { fermerModale(btn.dataset.modal); });
+  });
+  ["modal-creation", "modal-edition"].forEach(function (id) {
+    document.getElementById(id).addEventListener("click", function (event) {
+      if (event.target.id === id) fermerModale(id);
+    });
+  });
+
+  // --- Modifier : pré-remplit le formulaire partagé de la modale d'édition ---
+  const EDIT_UPDATE_URL_TEMPLATE = "{% url 'users:utilisateur_update' '00000000-0000-0000-0000-000000000000' %}";
+  const formEdition = document.getElementById("form-edition");
+
+  document.querySelectorAll(".btn-modifier").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      formEdition.action = EDIT_UPDATE_URL_TEMPLATE.replace("00000000-0000-0000-0000-000000000000", btn.dataset.id);
+
+      const champUsername = document.getElementById("{{ update_form.username.id_for_label }}");
+      const champEmail = document.getElementById("{{ update_form.email.id_for_label }}");
+      const champPrenom = document.getElementById("{{ update_form.first_name.id_for_label }}");
+      const champNom = document.getElementById("{{ update_form.last_name.id_for_label }}");
+      const champTelephone = document.getElementById("{{ update_form.telephone.id_for_label }}");
+      const champRole = document.getElementById("{{ update_form.role.id_for_label }}");
+      const champAgence = document.getElementById("{{ update_form.agence.id_for_label }}");
+
+      if (champUsername) champUsername.value = btn.dataset.username || "";
+      if (champEmail) champEmail.value = btn.dataset.email || "";
+      if (champPrenom) champPrenom.value = btn.dataset.firstName || "";
+      if (champNom) champNom.value = btn.dataset.lastName || "";
+      if (champTelephone) champTelephone.value = btn.dataset.telephone || "";
+      if (champRole && !champRole.disabled) champRole.value = btn.dataset.role || "";
+      if (champAgence && !champAgence.disabled) champAgence.value = btn.dataset.agenceId || "";
+
+      ouvrirModale("modal-edition");
+    });
+  });
+
+  // --- Modale de confirmation (désactivation) ---
+  const confirmModal = document.getElementById("confirm-modal");
+  const confirmBtn = document.getElementById("confirm-modal-confirm");
+  const cancelBtn = document.getElementById("confirm-modal-cancel");
+  let pendingForm = null;
+
+  cancelBtn.addEventListener("click", function () { fermerModale("confirm-modal"); pendingForm = null; });
+  confirmModal.addEventListener("click", function (event) {
+    if (event.target === confirmModal) { fermerModale("confirm-modal"); pendingForm = null; }
+  });
+  confirmBtn.addEventListener("click", function () {
+    if (pendingForm) pendingForm.submit();
+    fermerModale("confirm-modal");
+  });
+
+  document.querySelectorAll("[data-confirm-action='desactiver']").forEach(function (trigger) {
+    trigger.addEventListener("click", function () {
+      pendingForm = document.getElementById(trigger.dataset.confirmForm);
+      ouvrirModale("confirm-modal");
+    });
+  });
+
+  // --- Rouvre automatiquement la bonne modale après une erreur de validation ---
+  {% if modale_a_ouvrir == "creation" %}
+    ouvrirModale("modal-creation");
+  {% elif modale_a_ouvrir == "edition" %}
+    formEdition.action = EDIT_UPDATE_URL_TEMPLATE.replace("00000000-0000-0000-0000-000000000000", "{{ update_pk }}");
+    ouvrirModale("modal-edition");
+  {% endif %}
+})();
+</script>
+{% endblock %}
