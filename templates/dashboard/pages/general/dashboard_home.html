@@ -1,125 +1,63 @@
 {% extends "dashboard/base.html" %}
-{% load static %}
 
 {% block title %}Tableau de bord{% endblock %}
 {% block page_title %}Tableau de bord{% endblock %}
-{% block current_branch %}{% if agence %}{{ agence.nom }}{% else %}Toutes les agences{% endif %}{% endblock %}
 
 {% block content %}
+
+<!-- Chargé avant les inclusions ci-dessous : chaque partiel de dashboard
+     appelle `new Chart(...)` dans son propre <script>, il faut donc que la
+     librairie et les réglages communs existent déjà à ce moment-là. -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+  // Réglages communs à tous les graphiques du dashboard, pour une charte
+  // visuelle cohérente sans les répéter à chaque instanciation de Chart().
+  window.DASHBOARD_CHART_DEFAULTS = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { labels: { boxWidth: 10, font: { size: 11 }, color: "#6b7280" } },
+      tooltip: { titleFont: { size: 12 }, bodyFont: { size: 12 } },
+    },
+    scales: {
+      x: { ticks: { font: { size: 10 }, color: "#9ca3af" }, grid: { display: false } },
+      y: { ticks: { font: { size: 10 }, color: "#9ca3af" }, grid: { color: "#f3f4f6" } },
+    },
+  };
+  window.DASHBOARD_COLORS = ["#1e3a5f", "#2563eb", "#0ea5e9", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899"];
+
+  window.dashboardReadJson = function (elementId) {
+    const el = document.getElementById(elementId);
+    if (!el) return null;
+    try { return JSON.parse(el.textContent); } catch (e) { return null; }
+  };
+</script>
+
 <div class="space-y-6">
 
-  <!-- Metric cards -->
-  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-
-    <div class="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
-      <div class="flex items-center justify-between">
-        <p class="text-sm font-medium text-gray-500">Ventes du jour</p>
-        <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-50 text-primary-700">
-          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.836l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 1.792-4.94 1.938-7.5H5.106M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" /></svg>
-        </span>
-      </div>
-      <p class="mt-3 text-2xl font-bold text-gray-900">128 500 FCFA</p>
-      <p class="mt-1 text-xs text-green-600">+12% par rapport à hier</p>
+  {% if messages %}
+    <div class="space-y-2">
+      {% for message in messages %}
+        <div class="rounded-lg border px-4 py-2.5 text-sm
+          {% if message.tags == 'success' %}border-green-200 bg-green-50 text-green-800
+          {% elif message.tags == 'warning' %}border-amber-200 bg-amber-50 text-amber-800
+          {% elif message.tags == 'error' %}border-red-200 bg-red-50 text-red-700
+          {% else %}border-blue-200 bg-blue-50 text-blue-800{% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
     </div>
+  {% endif %}
 
-    <div class="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
-      <div class="flex items-center justify-between">
-        <p class="text-sm font-medium text-gray-500">Commandes en attente</p>
-        <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-secondary-50 text-secondary-700">
-          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-        </span>
-      </div>
-      <p class="mt-3 text-2xl font-bold text-gray-900">7</p>
-      <p class="mt-1 text-xs text-gray-400">À traiter aujourd'hui</p>
-    </div>
+  {% include "dashboard/pages/general/includes/_dashboard_filtres.html" %}
 
-    <div class="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
-      <div class="flex items-center justify-between">
-        <p class="text-sm font-medium text-gray-500">Stock bas</p>
-        <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-50 text-amber-700">
-          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" /></svg>
-        </span>
-      </div>
-      <p class="mt-3 text-2xl font-bold text-gray-900">14 produits</p>
-      <p class="mt-1 text-xs text-amber-600">Sous le seuil d'alerte</p>
-    </div>
+  {% if dashboard_mode == "global" %}
+    {% include "dashboard/pages/general/includes/_dashboard_global.html" %}
+  {% elif dashboard_mode == "agence" %}
+    {% include "dashboard/pages/general/includes/_dashboard_agence.html" %}
+  {% elif dashboard_mode == "caissier" %}
+    {% include "dashboard/pages/general/includes/_dashboard_caissier.html" %}
+  {% endif %}
 
-    <div class="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
-      <div class="flex items-center justify-between">
-        <p class="text-sm font-medium text-gray-500">Clients servis</p>
-        <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-50 text-primary-700">
-          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" /></svg>
-        </span>
-      </div>
-      <p class="mt-3 text-2xl font-bold text-gray-900">42</p>
-      <p class="mt-1 text-xs text-gray-400">Aujourd'hui, toutes agences</p>
-    </div>
-  </div>
-
-  <!-- Chart + top products -->
-  <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
-    <div class="rounded-xl border border-gray-100 bg-white p-5 shadow-sm lg:col-span-2">
-      <div class="mb-4 flex items-center justify-between">
-        <h2 class="text-sm font-semibold text-gray-900">Ventes sur 7 jours</h2>
-        <select class="rounded-lg border border-gray-200 py-1.5 pl-3 pr-8 text-xs text-gray-600 focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600/20">
-          <option>Toutes les agences</option>
-          <option>Agence principale</option>
-        </select>
-      </div>
-      <div class="h-64">
-        <canvas id="salesChart"></canvas>
-      </div>
-    </div>
-
-    <div class="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
-      <h2 class="mb-4 text-sm font-semibold text-gray-900">Produits les plus vendus</h2>
-      <ul class="space-y-3">
-        <li class="flex items-center justify-between text-sm">
-          <span class="text-gray-700">Riz local 5kg</span>
-          <span class="font-medium text-gray-900">86 ventes</span>
-        </li>
-        <li class="flex items-center justify-between text-sm">
-          <span class="text-gray-700">Huile végétale 1L</span>
-          <span class="font-medium text-gray-900">64 ventes</span>
-        </li>
-        <li class="flex items-center justify-between text-sm">
-          <span class="text-gray-700">Savon de toilette</span>
-          <span class="font-medium text-gray-900">51 ventes</span>
-        </li>
-        <li class="flex items-center justify-between text-sm">
-          <span class="text-gray-700">Sucre en poudre 1kg</span>
-          <span class="font-medium text-gray-900">47 ventes</span>
-        </li>
-      </ul>
-    </div>
-  </div>
 </div>
-{% endblock %}
-
-{% block extra_js %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
-<script>
-  const ctx = document.getElementById('salesChart');
-  new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
-      datasets: [{
-        label: 'Ventes (FCFA)',
-        data: [95000, 108000, 99000, 121000, 134000, 156000, 128500],
-        borderColor: '#000080',
-        backgroundColor: 'rgba(0, 0, 128, 0.08)',
-        tension: 0.35,
-        fill: true,
-        pointRadius: 3
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: { y: { beginAtZero: true } }
-    }
-  });
-</script>
 {% endblock %}

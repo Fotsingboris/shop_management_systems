@@ -1,0 +1,241 @@
+{% comment %}
+Dashboard Admin — toutes agences confondues (EF-9.2, EF-12.4). Le filtre
+agence n'est PAS ici un filtre de données (les KPIs restent globaux) : un
+Admin qui veut se concentrer sur UNE agence clique sur "Voir" dans le
+tableau récapitulatif, qui l'amène sur le dashboard dédié à cette agence
+(même filtre de période conservé).
+{% endcomment %}
+
+<div>
+  <h2 class="text-lg font-semibold text-gray-900">Vue d'ensemble</h2>
+  <p class="mt-1 text-sm text-gray-500">{{ periode.label }} · toutes agences</p>
+</div>
+
+<!-- KPIs -->
+<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+  <div class="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
+    <p class="text-sm font-medium text-gray-500">Chiffre d'affaires</p>
+    <p class="mt-3 text-2xl font-bold text-gray-900">{{ kpis.ca|floatformat:0 }} {{ parametres.devise }}</p>
+  </div>
+  <div class="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
+    <p class="text-sm font-medium text-gray-500">Ventes</p>
+    <p class="mt-3 text-2xl font-bold text-gray-900">{{ kpis.nombre_ventes }}</p>
+  </div>
+  <div class="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
+    <p class="text-sm font-medium text-gray-500">Panier moyen</p>
+    <p class="mt-3 text-2xl font-bold text-gray-900">{{ kpis.panier_moyen|floatformat:0 }} {{ parametres.devise }}</p>
+  </div>
+  <div class="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
+    <div class="flex items-center justify-between">
+      <p class="text-sm font-medium text-gray-500">Alertes stock bas</p>
+      {% if produits_stock_bas_total %}
+        <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-50 text-amber-700">
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" /></svg>
+        </span>
+      {% endif %}
+    </div>
+    <p class="mt-3 text-2xl font-bold {% if produits_stock_bas_total %}text-amber-600{% else %}text-gray-900{% endif %}">{{ produits_stock_bas_total }}</p>
+    <p class="mt-1 text-xs text-gray-400">Valeur du stock : {{ valeur_stock|floatformat:0 }} {{ parametres.devise }}</p>
+  </div>
+</div>
+
+<!-- Graphiques -->
+<div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+  <div class="rounded-xl border border-gray-100 bg-white p-5 shadow-sm lg:col-span-2">
+    <h3 class="mb-4 text-sm font-semibold text-gray-900">Chiffre d'affaires dans le temps</h3>
+    <div class="h-64"><canvas id="chart-ca-global"></canvas></div>
+  </div>
+  <div class="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
+    <h3 class="mb-4 text-sm font-semibold text-gray-900">Ventes par paiement</h3>
+    <div class="h-64"><canvas id="chart-paiements-global"></canvas></div>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+  <div class="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
+    <h3 class="mb-4 text-sm font-semibold text-gray-900">CA par agence</h3>
+    <div class="h-64"><canvas id="chart-ca-agences"></canvas></div>
+  </div>
+  <div class="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
+    <h3 class="mb-4 text-sm font-semibold text-gray-900">Top produits</h3>
+    <div class="h-64"><canvas id="chart-top-produits-global"></canvas></div>
+  </div>
+  <div class="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
+    <h3 class="mb-4 text-sm font-semibold text-gray-900">Ventes par catégorie</h3>
+    <div class="h-64"><canvas id="chart-categories"></canvas></div>
+  </div>
+</div>
+
+<!-- Aperçu par agence -->
+<div class="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
+  <div class="border-b border-gray-100 px-4 py-3 sm:px-6">
+    <h3 class="text-sm font-semibold text-gray-900">Aperçu par agence</h3>
+  </div>
+  <div class="overflow-x-auto">
+    <table class="w-full min-w-[520px] text-left text-sm">
+      <thead class="border-b border-gray-100 bg-gray-50">
+        <tr>
+          <th class="px-4 py-3 font-medium text-gray-500">Agence</th>
+          <th class="px-4 py-3 text-right font-medium text-gray-500">CA (période)</th>
+          <th class="px-4 py-3 text-right font-medium text-gray-500">Stock bas</th>
+          <th class="px-4 py-3 font-medium text-gray-500">Statut</th>
+          <th class="px-4 py-3 text-right font-medium text-gray-500">Tableau de bord</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        {% for ligne in agences_apercu %}
+          <tr class="hover:bg-gray-50">
+            <td class="px-4 py-3 font-medium text-gray-900">{{ ligne.agence.nom }}</td>
+            <td class="px-4 py-3 text-right text-gray-700">{{ ligne.ca|floatformat:0 }} {{ parametres.devise }}</td>
+            <td class="px-4 py-3 text-right {% if ligne.stock_bas %}font-medium text-amber-600{% else %}text-gray-400{% endif %}">{{ ligne.stock_bas }}</td>
+            <td class="px-4 py-3">
+              <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {% if ligne.agence.actif %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-500{% endif %}">
+                {{ ligne.agence.actif|yesno:"Active,Désactivée" }}
+              </span>
+            </td>
+            <td class="px-4 py-3 text-right">
+              <a href="{% url 'general:agence_dashboard' ligne.agence.slug %}?periode={{ periode.cle }}" class="text-xs font-medium text-primary-700 hover:text-primary-900">Voir →</a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="5" class="px-4 py-10 text-center text-sm text-gray-400">Aucune agence enregistrée.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Stock bas -->
+{% if produits_stock_bas %}
+  <div class="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
+    <div class="flex items-center justify-between border-b border-gray-100 px-4 py-3 sm:px-6">
+      <h3 class="text-sm font-semibold text-gray-900">Produits en stock bas (toutes agences)</h3>
+      <a href="{% url 'products:stock_list' %}?stock_bas=1" class="text-xs font-medium text-primary-700 hover:text-primary-900">Voir le stock →</a>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full min-w-[520px] text-left text-sm">
+        <thead class="border-b border-gray-100 bg-gray-50">
+          <tr>
+            <th class="px-4 py-3 font-medium text-gray-500">Produit</th>
+            <th class="px-4 py-3 font-medium text-gray-500">Agence</th>
+            <th class="px-4 py-3 text-right font-medium text-gray-500">Stock actuel</th>
+            <th class="px-4 py-3 text-right font-medium text-gray-500">Seuil d'alerte</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          {% for stock in produits_stock_bas %}
+            <tr class="hover:bg-gray-50">
+              <td class="px-4 py-3 font-medium text-gray-900">{{ stock.produit.nom }}</td>
+              <td class="px-4 py-3 text-gray-500">{{ stock.agence.nom }}</td>
+              <td class="px-4 py-3 text-right text-amber-600 font-medium">{{ stock.stock_quantite }}</td>
+              <td class="px-4 py-3 text-right text-gray-500">{{ stock.seuil_alerte }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endif %}
+
+<!-- Ventes récentes -->
+<div class="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
+  <div class="flex items-center justify-between border-b border-gray-100 px-4 py-3 sm:px-6">
+    <h3 class="text-sm font-semibold text-gray-900">Ventes récentes</h3>
+    <a href="{% url 'sales:commande_list' %}" class="text-xs font-medium text-primary-700 hover:text-primary-900">Voir tout →</a>
+  </div>
+  <div class="overflow-x-auto">
+    <table class="w-full min-w-[620px] text-left text-sm">
+      <thead class="border-b border-gray-100 bg-gray-50">
+        <tr>
+          <th class="px-4 py-3 font-medium text-gray-500">N° vente</th>
+          <th class="px-4 py-3 font-medium text-gray-500">Agence</th>
+          <th class="px-4 py-3 font-medium text-gray-500">Caissier</th>
+          <th class="px-4 py-3 text-right font-medium text-gray-500">Total</th>
+          <th class="px-4 py-3 font-medium text-gray-500">Statut</th>
+          <th class="px-4 py-3 font-medium text-gray-500">Date</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        {% for commande in ventes_recentes %}
+          <tr class="cursor-pointer hover:bg-gray-50" onclick="window.location='{% url 'sales:commande_detail' commande.pk %}'">
+            <td class="px-4 py-3 font-mono text-xs text-gray-500">{{ commande.id|stringformat:"s"|slice:":8" }}</td>
+            <td class="px-4 py-3 text-gray-500">{{ commande.agence.nom }}</td>
+            <td class="px-4 py-3 text-gray-500">{{ commande.caissier.get_full_name|default:commande.caissier.username }}</td>
+            <td class="px-4 py-3 text-right font-medium text-gray-900">{{ commande.total }}</td>
+            <td class="px-4 py-3">
+              <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium
+                {% if commande.statut == 'TERMINEE' %}bg-green-100 text-green-800{% else %}bg-blue-100 text-blue-800{% endif %}">
+                {{ commande.get_statut_display }}
+              </span>
+            </td>
+            <td class="px-4 py-3 whitespace-nowrap text-gray-500">{{ commande.date|date:"d/m/Y H:i" }}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="6" class="px-4 py-10 text-center text-sm text-gray-400">Aucune vente sur cette période.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{{ serie_ca|json_script:"data-ca-global" }}
+{{ ventes_paiement|json_script:"data-paiements-global" }}
+{{ ca_par_agence|json_script:"data-ca-agences" }}
+{{ top_produits|json_script:"data-top-produits-global" }}
+{{ ventes_categorie|json_script:"data-categories" }}
+<script>
+(function () {
+  const ca = window.dashboardReadJson("data-ca-global");
+  const paiements = window.dashboardReadJson("data-paiements-global");
+  const caAgences = window.dashboardReadJson("data-ca-agences");
+  const topProduits = window.dashboardReadJson("data-top-produits-global");
+  const categories = window.dashboardReadJson("data-categories");
+
+  if (ca) {
+    new Chart(document.getElementById("chart-ca-global"), {
+      type: "line",
+      data: { labels: ca.labels, datasets: [{
+        label: "CA", data: ca.data, borderColor: window.DASHBOARD_COLORS[0],
+        backgroundColor: "rgba(30, 58, 95, 0.08)", tension: 0.35, fill: true, pointRadius: 2,
+      }] },
+      options: Object.assign({}, window.DASHBOARD_CHART_DEFAULTS, {
+        plugins: Object.assign({}, window.DASHBOARD_CHART_DEFAULTS.plugins, { legend: { display: false } }),
+      }),
+    });
+  }
+
+  if (paiements && paiements.labels.length) {
+    new Chart(document.getElementById("chart-paiements-global"), {
+      type: "doughnut",
+      data: { labels: paiements.labels, datasets: [{ data: paiements.data, backgroundColor: window.DASHBOARD_COLORS }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "bottom", labels: { boxWidth: 10, font: { size: 11 } } } } },
+    });
+  }
+
+  if (caAgences && caAgences.labels.length) {
+    new Chart(document.getElementById("chart-ca-agences"), {
+      type: "bar",
+      data: { labels: caAgences.labels, datasets: [{ label: "CA", data: caAgences.data, backgroundColor: window.DASHBOARD_COLORS[1] }] },
+      options: Object.assign({}, window.DASHBOARD_CHART_DEFAULTS, {
+        plugins: Object.assign({}, window.DASHBOARD_CHART_DEFAULTS.plugins, { legend: { display: false } }) }),
+    });
+  }
+
+  if (topProduits && topProduits.labels.length) {
+    new Chart(document.getElementById("chart-top-produits-global"), {
+      type: "bar",
+      data: { labels: topProduits.labels, datasets: [{ label: "CA", data: topProduits.data, backgroundColor: window.DASHBOARD_COLORS[2] }] },
+      options: Object.assign({}, window.DASHBOARD_CHART_DEFAULTS, { indexAxis: "y",
+        plugins: Object.assign({}, window.DASHBOARD_CHART_DEFAULTS.plugins, { legend: { display: false } }) }),
+    });
+  }
+
+  if (categories && categories.labels.length) {
+    new Chart(document.getElementById("chart-categories"), {
+      type: "doughnut",
+      data: { labels: categories.labels, datasets: [{ data: categories.data, backgroundColor: window.DASHBOARD_COLORS }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "bottom", labels: { boxWidth: 10, font: { size: 11 } } } } },
+    });
+  }
+})();
+</script>
