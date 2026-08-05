@@ -1,0 +1,198 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Rapport de ventes{% endblock %}
+{% block page_title %}Rapports{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+  {% if messages %}
+    <div class="space-y-2">
+      {% for message in messages %}
+        <div class="rounded-lg border px-4 py-2.5 text-sm
+          {% if message.tags == 'success' %}border-green-200 bg-green-50 text-green-800
+          {% elif message.tags == 'warning' %}border-amber-200 bg-amber-50 text-amber-800
+          {% elif message.tags == 'error' %}border-red-200 bg-red-50 text-red-700
+          {% else %}border-blue-200 bg-blue-50 text-blue-800{% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {% include "dashboard/pages/general/reports/_report_tabs.html" %}
+
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <h2 class="text-lg font-semibold text-gray-900">Ventes</h2>
+      <p class="mt-1 text-sm text-gray-500">Détail des ventes, par agence, vendeur, catégorie, produit et période.</p>
+    </div>
+    <div class="flex gap-2">
+      <a href="{% url 'general:rapport_ventes_export_excel' %}?{{ querystring_export }}"
+         class="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50">
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
+        Excel
+      </a>
+      <a href="{% url 'general:rapport_ventes_export_pdf' %}?{{ querystring_export }}"
+         class="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50">
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
+        PDF
+      </a>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+    <div class="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
+      <p class="text-xs font-medium text-gray-500">Ventes</p>
+      <p class="mt-1 text-2xl font-semibold text-gray-900">{{ kpis.nombre_ventes }}</p>
+    </div>
+    <div class="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
+      <p class="text-xs font-medium text-gray-500">Unités vendues</p>
+      <p class="mt-1 text-2xl font-semibold text-gray-900">{{ kpis.quantite_totale }}</p>
+    </div>
+    <div class="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
+      <p class="text-xs font-medium text-gray-500">Chiffre d'affaires</p>
+      <p class="mt-1 text-2xl font-semibold text-gray-900">{{ kpis.montant_total }} {% if parametres %}{{ parametres.devise }}{% endif %}</p>
+    </div>
+  </div>
+
+  <!-- Filtres -->
+  <form method="get" class="flex flex-wrap items-end gap-3 rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
+    <div class="min-w-[140px]">
+      <label for="date_debut" class="mb-1.5 block text-xs font-medium text-gray-500">Du</label>
+      <input type="date" id="date_debut" name="date_debut" value="{{ filtres.date_debut|date:'Y-m-d' }}"
+        class="block w-full rounded-lg border border-gray-300 bg-white py-2 px-3 text-sm text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600/30">
+    </div>
+    <div class="min-w-[140px]">
+      <label for="date_fin" class="mb-1.5 block text-xs font-medium text-gray-500">Au</label>
+      <input type="date" id="date_fin" name="date_fin" value="{{ filtres.date_fin|date:'Y-m-d' }}"
+        class="block w-full rounded-lg border border-gray-300 bg-white py-2 px-3 text-sm text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600/30">
+    </div>
+    {% if est_admin %}
+      <div class="min-w-[160px]">
+        <label for="agence" class="mb-1.5 block text-xs font-medium text-gray-500">Agence</label>
+        <select id="agence" name="agence"
+          class="block w-full rounded-lg border border-gray-300 bg-white py-2 px-3 text-sm text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600/30">
+          <option value="">Toutes</option>
+          {% for a in agences %}
+            <option value="{{ a.pk }}" {% if filtres.agence_id == a.pk|stringformat:"s" %}selected{% endif %}>{{ a.nom }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    {% endif %}
+    <div class="min-w-[160px]">
+      <label for="caissier" class="mb-1.5 block text-xs font-medium text-gray-500">Vendeur</label>
+      <select id="caissier" name="caissier"
+        class="block w-full rounded-lg border border-gray-300 bg-white py-2 px-3 text-sm text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600/30">
+        <option value="">Tous</option>
+        {% for u in caissiers %}
+          <option value="{{ u.pk }}" {% if filtres.caissier_id == u.pk|stringformat:"s" %}selected{% endif %}>{{ u.get_full_name|default:u.username }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="min-w-[160px]">
+      <label for="categorie" class="mb-1.5 block text-xs font-medium text-gray-500">Catégorie</label>
+      <select id="categorie" name="categorie"
+        class="block w-full rounded-lg border border-gray-300 bg-white py-2 px-3 text-sm text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600/30">
+        <option value="">Toutes</option>
+        {% for c in categories %}
+          <option value="{{ c.pk }}" {% if filtres.categorie_id == c.pk|stringformat:"s" %}selected{% endif %}>{{ c.nom }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="min-w-[160px]">
+      <label for="produit" class="mb-1.5 block text-xs font-medium text-gray-500">Produit</label>
+      <select id="produit" name="produit"
+        class="block w-full rounded-lg border border-gray-300 bg-white py-2 px-3 text-sm text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600/30">
+        <option value="">Tous</option>
+        {% for p in produits %}
+          <option value="{{ p.pk }}" {% if filtres.produit_id == p.pk|stringformat:"s" %}selected{% endif %}>{{ p.nom }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="min-w-[140px]">
+      <label for="statut" class="mb-1.5 block text-xs font-medium text-gray-500">Statut</label>
+      <select id="statut" name="statut"
+        class="block w-full rounded-lg border border-gray-300 bg-white py-2 px-3 text-sm text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600/30">
+        <option value="">Terminées + remboursées</option>
+        {% for value, label in statuts %}
+          <option value="{{ value }}" {% if filtres.statut == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <button type="submit" class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50">
+        Filtrer
+      </button>
+    </div>
+  </form>
+
+  <!-- Résultats -->
+  <div class="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
+    <div class="overflow-x-auto">
+      <table class="w-full min-w-[960px] text-left text-sm">
+        <thead class="border-b border-gray-100 bg-gray-50">
+          <tr>
+            <th class="px-4 py-3 font-medium text-gray-500">Date</th>
+            <th class="px-4 py-3 font-medium text-gray-500">N° vente</th>
+            {% if est_admin %}<th class="px-4 py-3 font-medium text-gray-500">Agence</th>{% endif %}
+            <th class="px-4 py-3 font-medium text-gray-500">Vendeur</th>
+            <th class="px-4 py-3 font-medium text-gray-500">Produit</th>
+            <th class="px-4 py-3 font-medium text-gray-500">Catégorie</th>
+            <th class="px-4 py-3 font-medium text-gray-500">Qté</th>
+            <th class="px-4 py-3 font-medium text-gray-500">Prix unit.</th>
+            <th class="px-4 py-3 font-medium text-gray-500">Sous-total</th>
+            <th class="px-4 py-3 font-medium text-gray-500">Statut</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          {% for ligne in lignes_ventes %}
+            <tr class="hover:bg-gray-50">
+              <td class="px-4 py-3 text-gray-500">{{ ligne.commande.date|date:"d/m/Y H:i" }}</td>
+              <td class="px-4 py-3 font-mono text-xs text-gray-500">{{ ligne.commande.id|stringformat:"s"|slice:":8"|upper }}</td>
+              {% if est_admin %}<td class="px-4 py-3 text-gray-500">{{ ligne.commande.agence.nom }}</td>{% endif %}
+              <td class="px-4 py-3 text-gray-500">{{ ligne.commande.caissier.get_full_name|default:ligne.commande.caissier.username }}</td>
+              <td class="px-4 py-3">
+                <p class="font-medium text-gray-900">{{ ligne.produit.nom }}</p>
+                <p class="font-mono text-xs text-gray-400">{{ ligne.produit.sku }}</p>
+              </td>
+              <td class="px-4 py-3 text-gray-500">{{ ligne.produit.categorie.nom }}</td>
+              <td class="px-4 py-3 text-gray-500">{{ ligne.quantite }}</td>
+              <td class="px-4 py-3 text-gray-500">{{ ligne.prix_unitaire }}</td>
+              <td class="px-4 py-3 font-medium text-gray-900">{{ ligne.sous_total }}</td>
+              <td class="px-4 py-3">
+                <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium
+                  {% if ligne.commande.statut == 'TERMINEE' %}bg-green-100 text-green-800
+                  {% elif ligne.commande.statut == 'REMBOURSEE' %}bg-amber-100 text-amber-800
+                  {% elif ligne.commande.statut == 'ANNULEE' %}bg-red-100 text-red-800
+                  {% else %}bg-gray-100 text-gray-700{% endif %}">
+                  {{ ligne.commande.get_statut_display }}
+                </span>
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="10" class="px-4 py-10 text-center text-sm text-gray-400">Aucune vente pour ces filtres.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% if is_paginated %}
+      <div class="flex items-center justify-between border-t border-gray-100 px-4 py-3 text-sm">
+        <p class="text-gray-500">Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}</p>
+        <div class="flex gap-2">
+          {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}&date_debut={{ filtres.date_debut|date:'Y-m-d' }}&date_fin={{ filtres.date_fin|date:'Y-m-d' }}&agence={{ filtres.agence_id }}&caissier={{ filtres.caissier_id }}&categorie={{ filtres.categorie_id }}&produit={{ filtres.produit_id }}&statut={{ filtres.statut }}"
+              class="rounded-lg border border-gray-300 px-3 py-1.5 text-gray-700 hover:bg-gray-50">Précédent</a>
+          {% endif %}
+          {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}&date_debut={{ filtres.date_debut|date:'Y-m-d' }}&date_fin={{ filtres.date_fin|date:'Y-m-d' }}&agence={{ filtres.agence_id }}&caissier={{ filtres.caissier_id }}&categorie={{ filtres.categorie_id }}&produit={{ filtres.produit_id }}&statut={{ filtres.statut }}"
+              class="rounded-lg border border-gray-300 px-3 py-1.5 text-gray-700 hover:bg-gray-50">Suivant</a>
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

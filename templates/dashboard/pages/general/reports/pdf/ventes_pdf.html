@@ -1,0 +1,90 @@
+<!doctype html>
+{# Gabarit autonome (pas de dashboard/base.html) : rendu par WeasyPrint, pas par un navigateur. #}
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Rapport de ventes</title>
+  <style>
+    @page { size: A4 landscape; margin: 14mm 12mm; }
+    body { font-family: "Helvetica Neue", Arial, sans-serif; color: #111827; font-size: 10px; }
+    .en-tete { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #1F2937; padding-bottom: 10px; margin-bottom: 14px; }
+    .entreprise-nom { font-size: 16px; font-weight: 700; margin: 0; }
+    .entreprise-info { color: #6B7280; font-size: 9px; margin: 2px 0 0; }
+    .titre-rapport { text-align: right; }
+    .titre-rapport h1 { font-size: 14px; margin: 0; }
+    .titre-rapport p { color: #6B7280; font-size: 9px; margin: 2px 0 0; }
+    .kpis { display: flex; gap: 10px; margin-bottom: 14px; }
+    .kpi { flex: 1; border: 1px solid #E5E7EB; border-radius: 6px; padding: 8px 10px; }
+    .kpi p.label { color: #6B7280; font-size: 8px; margin: 0 0 2px; text-transform: uppercase; }
+    .kpi p.valeur { font-size: 14px; font-weight: 700; margin: 0; }
+    table { width: 100%; border-collapse: collapse; }
+    th { background: #1F2937; color: #fff; text-align: left; padding: 6px 8px; font-size: 9px; }
+    td { padding: 5px 8px; border-bottom: 1px solid #E5E7EB; font-size: 9px; }
+    tr:nth-child(even) td { background: #F9FAFB; }
+    .pied-page { margin-top: 16px; color: #9CA3AF; font-size: 8px; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="en-tete">
+    <div>
+      <p class="entreprise-nom">{{ parametres.nom }}</p>
+      {% if parametres.adresse %}<p class="entreprise-info">{{ parametres.adresse }}</p>{% endif %}
+      {% if parametres.telephone or parametres.email %}
+        <p class="entreprise-info">{{ parametres.telephone }}{% if parametres.telephone and parametres.email %} · {% endif %}{{ parametres.email }}</p>
+      {% endif %}
+    </div>
+    <div class="titre-rapport">
+      <h1>Rapport de ventes</h1>
+      <p>
+        {% if filtres.date_debut and filtres.date_fin %}Du {{ filtres.date_debut|date:"d/m/Y" }} au {{ filtres.date_fin|date:"d/m/Y" }}<br>{% endif %}
+        Généré le {{ genere_le|date:"d/m/Y à H:i" }} par {{ genere_par.get_full_name|default:genere_par.username }}
+      </p>
+    </div>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi"><p class="label">Ventes</p><p class="valeur">{{ kpis.nombre_ventes }}</p></div>
+    <div class="kpi"><p class="label">Unités vendues</p><p class="valeur">{{ kpis.quantite_totale }}</p></div>
+    <div class="kpi"><p class="label">Chiffre d'affaires</p><p class="valeur">{{ kpis.montant_total }} {{ parametres.devise }}</p></div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>N° vente</th>
+        <th>Agence</th>
+        <th>Vendeur</th>
+        <th>Client</th>
+        <th>Produit</th>
+        <th>Catégorie</th>
+        <th>Qté</th>
+        <th>Prix unit.</th>
+        <th>Sous-total</th>
+        <th>Statut</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for ligne in lignes %}
+        <tr>
+          <td>{{ ligne.commande.date|date:"d/m/Y H:i" }}</td>
+          <td>{{ ligne.commande.id|stringformat:"s"|slice:":8"|upper }}</td>
+          <td>{{ ligne.commande.agence.nom }}</td>
+          <td>{{ ligne.commande.caissier.get_full_name|default:ligne.commande.caissier.username }}</td>
+          <td>{% if ligne.commande.client_id %}{{ ligne.commande.client.nom }}{% else %}Client de passage{% endif %}</td>
+          <td>{{ ligne.produit.nom }}</td>
+          <td>{{ ligne.produit.categorie.nom }}</td>
+          <td>{{ ligne.quantite }}</td>
+          <td>{{ ligne.prix_unitaire }} {{ parametres.devise }}</td>
+          <td>{{ ligne.sous_total }} {{ parametres.devise }}</td>
+          <td>{{ ligne.commande.get_statut_display }}</td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="11">Aucune vente pour ces filtres.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <p class="pied-page">{{ parametres.nom }}{% if parametres.tax_id %} · {{ parametres.tax_id }}{% endif %}</p>
+</body>
+</html>
