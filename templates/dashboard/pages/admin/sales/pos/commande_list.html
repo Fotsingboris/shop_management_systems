@@ -68,7 +68,7 @@
   <!-- Liste -->
   <div class="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
     <div class="overflow-x-auto">
-      <table class="w-full min-w-[720px] text-left text-sm">
+      <table class="w-full min-w-[820px] text-left text-sm">
         <thead class="border-b border-gray-100 bg-gray-50">
           <tr>
             <th scope="col" class="px-4 py-3 font-medium text-gray-500">N° vente</th>
@@ -78,11 +78,12 @@
             <th scope="col" class="px-4 py-3 text-right font-medium text-gray-500">Total</th>
             <th scope="col" class="px-4 py-3 font-medium text-gray-500">Statut</th>
             <th scope="col" class="px-4 py-3 font-medium text-gray-500">Date</th>
+            <th scope="col" class="sticky right-0 bg-gray-50 px-4 py-3 text-right font-medium text-gray-500">Actions</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-100">
           {% for commande in commandes %}
-            <tr class="cursor-pointer hover:bg-gray-50" onclick="window.location='{% url 'sales:commande_detail' commande.pk %}'">
+            <tr class="group cursor-pointer hover:bg-gray-50" onclick="window.location='{% url 'sales:commande_detail' commande.pk %}'">
               <td class="px-4 py-3 font-mono text-xs text-gray-500">{{ commande.id|stringformat:"s"|slice:":8" }}</td>
               <td class="px-4 py-3 text-gray-700">{{ commande.client.nom|default:"Client de passage" }}</td>
               <td class="px-4 py-3 text-gray-500">{{ commande.agence.nom }}</td>
@@ -98,10 +99,32 @@
                 </span>
               </td>
               <td class="px-4 py-3 whitespace-nowrap text-gray-500">{{ commande.date|date:"d/m/Y H:i" }}</td>
+              <td class="sticky right-0 bg-white px-4 py-3 group-hover:bg-gray-50">
+                <div class="flex items-center justify-end gap-1.5">
+                  <a href="{% url 'sales:recu_download' commande.pk %}" title="Télécharger le reçu"
+                    onclick="event.stopPropagation()"
+                    class="flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
+                  </a>
+                  {% if peut_gerer and commande.statut == 'TERMINEE' %}
+                    <form method="post" id="form-rembourser-{{ commande.pk }}"
+                      action="{% url 'sales:commande_statut_update' commande.pk %}" onclick="event.stopPropagation()">
+                      {% csrf_token %}
+                      <input type="hidden" name="statut" value="REMBOURSEE">
+                    </form>
+                    <button type="button" title="Rembourser cette vente"
+                      data-confirm-action="rembourser" data-confirm-form="form-rembourser-{{ commande.pk }}"
+                      onclick="event.stopPropagation()"
+                      class="flex h-8 w-8 items-center justify-center rounded-lg text-blue-500 hover:bg-blue-50 hover:text-blue-700">
+                      <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" /></svg>
+                    </button>
+                  {% endif %}
+                </div>
+              </td>
             </tr>
           {% empty %}
             <tr>
-              <td colspan="7" class="px-4 py-10 text-center text-sm text-gray-400">Aucune vente pour le moment.</td>
+              <td colspan="8" class="px-4 py-10 text-center text-sm text-gray-400">Aucune vente pour le moment.</td>
             </tr>
           {% endfor %}
         </tbody>
@@ -125,4 +148,58 @@
     {% endif %}
   </div>
 </div>
+
+<!-- Modale de confirmation (remboursement depuis la liste) -->
+<div id="confirm-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-gray-900/40 p-4">
+  <div class="w-full max-w-sm rounded-xl bg-white p-6 shadow-xl">
+    <h3 class="text-base font-semibold text-gray-900">Rembourser cette vente ?</h3>
+    <p class="mt-2 text-sm text-gray-500">Le stock vendu sera recrédité dans l'agence. Cette action est définitive.</p>
+    <div class="mt-6 flex justify-end gap-2">
+      <button type="button" id="confirm-modal-cancel"
+        class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+        Fermer
+      </button>
+      <button type="button" id="confirm-modal-confirm"
+        class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
+        Rembourser
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const modal = document.getElementById("confirm-modal");
+  const confirmBtn = document.getElementById("confirm-modal-confirm");
+  const cancelBtn = document.getElementById("confirm-modal-cancel");
+  let pendingForm = null;
+
+  function openModal(form) {
+    pendingForm = form;
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+  }
+  function closeModal() {
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+    pendingForm = null;
+  }
+
+  cancelBtn.addEventListener("click", closeModal);
+  modal.addEventListener("click", function (event) {
+    if (event.target === modal) closeModal();
+  });
+  confirmBtn.addEventListener("click", function () {
+    if (pendingForm) pendingForm.submit();
+    closeModal();
+  });
+
+  document.querySelectorAll("[data-confirm-action='rembourser']").forEach(function (trigger) {
+    trigger.addEventListener("click", function () {
+      const form = document.getElementById(trigger.dataset.confirmForm);
+      if (form) openModal(form);
+    });
+  });
+})();
+</script>
 {% endblock %}

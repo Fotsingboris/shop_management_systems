@@ -35,4 +35,6 @@ urlpatterns = [
         pos_views.CommandeStatutUpdateView.as_view(),
         name="commande_statut_update",
     ),
+    # Reçu PDF (généré à la volée si besoin)
+    path("ventes/<uuid:pk>/recu/", pos_views.RecuDownloadView.as_view(), name="recu_download"),
 ]

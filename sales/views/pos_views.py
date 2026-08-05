@@ -22,6 +22,7 @@ téléphone/nom.
 from __future__ import annotations
 
 import json
+import logging
 from decimal import Decimal
 from typing import Any, Dict, List, Optional
 
@@ -29,7 +30,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db import transaction
 from django.db.models import Q, QuerySet
-from django.http import HttpRequest, JsonResponse
+from django.http import FileResponse, HttpRequest, JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.utils.translation import gettext_lazy as _
 from django.views import View
@@ -40,7 +41,10 @@ from products.models import ProduitAgence
 from products.services import get_agences_autorisees, get_agences_visibles, get_categories_actives
 from sales.forms import CommandeForm
 from sales.models import Client, Commande, LigneCommande
+from sales.receipts import generer_recu_pdf
 from sales.services import get_commandes_visibles
+
+logger = logging.getLogger(__name__)
 
 
 def _to_int(value: Any) -> Optional[int]:
@@ -316,6 +320,24 @@ class CommandeCreateView(LoginRequiredMixin, POSAccessMixin, TemplateView):
             _("Vente enregistrée : %(n)d article(s) pour un total de %(total)s.")
             % {"n": len(lignes), "total": total},
         )
+
+        # Le reçu PDF est généré automatiquement après coup (EF-8.1) : une
+        # panne de WeasyPrint (paquet absent, dépendances système
+        # manquantes...) ne doit jamais faire échouer la vente elle-même —
+        # le bouton "Télécharger le reçu" régénère le PDF à la demande si
+        # cette étape a échoué ici.
+        try:
+            generer_recu_pdf(commande, base_url=request.build_absolute_uri("/"))
+        except Exception:
+            logger.exception("Échec de la génération automatique du reçu PDF pour la commande %s", commande.pk)
+            messages.warning(
+                request,
+                _(
+                    "La vente est enregistrée mais la génération automatique du reçu a échoué ; "
+                    "vous pouvez réessayer depuis le bouton « Télécharger le reçu »."
+                ),
+            )
+
         return redirect("sales:commande_detail", pk=commande.pk)
 
 
@@ -365,6 +387,9 @@ class CommandeListView(LoginRequiredMixin, ListView):
         context["statut_choices"] = CommandeStatut.choices
         agences_visibles = get_agences_visibles(self.request.user).order_by("nom")
         context["agences_visibles"] = agences_visibles if agences_visibles.count() > 1 else None
+        context["peut_gerer"] = getattr(self.request.user, "is_admin", False) or getattr(
+            self.request.user, "is_responsable_agence", False
+        )
         return context
 
 
@@ -393,6 +418,7 @@ class CommandeDetailView(LoginRequiredMixin, DetailView):
         context["peut_gerer"] = getattr(self.request.user, "is_admin", False) or getattr(
             self.request.user, "is_responsable_agence", False
         )
+        context["recu"] = getattr(self.object, "recu", None)
         return context
 
 
@@ -437,3 +463,36 @@ class CommandeStatutUpdateView(LoginRequiredMixin, CommandeGestionAccessMixin, V
         libelle = "annulée" if nouveau_statut == CommandeStatut.ANNULEE else "remboursée"
         messages.success(request, _("Vente %(libelle)s ; le stock vendu a été recrédité.") % {"libelle": libelle})
         return redirect("sales:commande_detail", pk=commande.pk)
+
+
+class RecuDownloadView(LoginRequiredMixin, View):
+    """Télécharge le reçu PDF d'une vente (EF-8.2), depuis la liste ou le détail.
+
+    Repart de ``get_commandes_visibles`` comme les autres écrans : un
+    utilisateur ne peut télécharger que le reçu d'une vente qu'il a le
+    droit de voir. Si le PDF n'a encore jamais été généré (vente
+    antérieure à cette fonctionnalité, ou échec de la génération
+    automatique au moment de la vente), il est généré à la volée puis
+    servi — pas d'erreur 404 pour l'utilisateur final.
+    """
+
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any):
+        commande = get_object_or_404(
+            get_commandes_visibles(request.user).select_related("agence", "caissier", "client"),
+            pk=kwargs["pk"],
+        )
+
+        recu = getattr(commande, "recu", None)
+        if recu is None or not recu.fichier_pdf:
+            try:
+                recu = generer_recu_pdf(commande, base_url=request.build_absolute_uri("/"))
+            except Exception:
+                logger.exception("Échec de la génération à la demande du reçu PDF pour la commande %s", commande.pk)
+                messages.error(request, _("Impossible de générer le reçu PDF pour cette vente."))
+                return redirect("sales:commande_detail", pk=commande.pk)
+
+        return FileResponse(
+            recu.fichier_pdf.open("rb"),
+            as_attachment=True,
+            filename=f"{recu.numero_recu}.pdf",
+        )

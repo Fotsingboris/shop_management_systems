@@ -235,3 +235,34 @@ django.core.exceptions.PermissionDenied
 2026-08-05 01:49:25,010 [INFO] django.utils.autoreload - Watching for file changes with StatReloader
 2026-08-05 02:04:21,785 [INFO] django.utils.autoreload - C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\sales\views\pos_views.py changed, reloading.
 2026-08-05 02:05:12,439 [INFO] django.utils.autoreload - Watching for file changes with StatReloader
+2026-08-05 02:28:21,298 [INFO] django.utils.autoreload - C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\sales\views\pos_views.py changed, reloading.
+2026-08-05 02:29:10,557 [INFO] django.utils.autoreload - Watching for file changes with StatReloader
+2026-08-05 02:35:01,975 [INFO] weasyprint.progress - Step 2 - Fetching and parsing CSS - CSS string
+2026-08-05 02:35:02,692 [INFO] weasyprint.progress - Step 2 - Fetching and parsing CSS - CSS string
+2026-08-05 02:35:02,793 [INFO] weasyprint.progress - Step 2 - Fetching and parsing CSS - CSS string
+2026-08-05 02:35:10,121 [ERROR] sales.views.pos_views - Échec de la génération à la demande du reçu PDF pour la commande ad224e30-c161-4463-bef6-a8fca51b7d69
+Traceback (most recent call last):
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\sales\views\pos_views.py", line 488, in get
+    recu = generer_recu_pdf(commande, base_url=request.build_absolute_uri("/"))
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\sales\receipts.py", line 65, in generer_recu_pdf
+    html_content = render_to_string(
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: sales/pdf/recu.html
+2026-08-05 02:35:43,457 [ERROR] sales.views.pos_views - Échec de la génération automatique du reçu PDF pour la commande 7a9380a8-010b-447b-a831-95e16c2da664
+Traceback (most recent call last):
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\sales\views\pos_views.py", line 330, in post
+    generer_recu_pdf(commande, base_url=request.build_absolute_uri("/"))
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\sales\receipts.py", line 65, in generer_recu_pdf
+    html_content = render_to_string(
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: sales/pdf/recu.html
+2026-08-05 02:36:43,773 [INFO] django.utils.autoreload - C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\sales\receipts.py changed, reloading.
+2026-08-05 02:37:19,612 [INFO] django.utils.autoreload - Watching for file changes with StatReloader
+2026-08-05 02:37:47,978 [INFO] django.utils.autoreload - C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\sales\receipts.py changed, reloading.
+2026-08-05 02:38:21,223 [INFO] django.utils.autoreload - Watching for file changes with StatReloader

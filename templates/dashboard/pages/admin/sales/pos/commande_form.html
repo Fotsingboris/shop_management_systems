@@ -190,6 +190,24 @@
         </div>
       </div>
     </form>
+
+    <!-- Modale de confirmation (remplace le confirm() natif) -->
+    <div id="confirm-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-gray-900/40 p-4">
+      <div class="w-full max-w-sm rounded-xl bg-white p-6 shadow-xl">
+        <h3 id="confirm-modal-title" class="text-base font-semibold text-gray-900">Vider le panier ?</h3>
+        <p id="confirm-modal-message" class="mt-2 text-sm text-gray-500">Tous les articles ajoutés seront retirés de la vente en cours.</p>
+        <div class="mt-6 flex justify-end gap-2">
+          <button type="button" id="confirm-modal-cancel"
+            class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+            Fermer
+          </button>
+          <button type="button" id="confirm-modal-confirm"
+            class="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700">
+            Vider le panier
+          </button>
+        </div>
+      </div>
+    </div>
   {% endif %}
 </div>
 
@@ -444,11 +462,32 @@
   remiseInput.addEventListener("input", updateTotals);
   taxeInput.addEventListener("input", updateTotals);
 
-  viderBtn.addEventListener("click", function () {
-    if (!Object.keys(selection).length) return;
-    if (!confirm("Vider le panier en cours ?")) return;
+  // --- Modale de confirmation ("Vider le panier") ----------------------
+  const confirmModal = document.getElementById("confirm-modal");
+  const confirmModalConfirm = document.getElementById("confirm-modal-confirm");
+  const confirmModalCancel = document.getElementById("confirm-modal-cancel");
+
+  function openConfirmModal() {
+    confirmModal.classList.remove("hidden");
+    confirmModal.classList.add("flex");
+  }
+  function closeConfirmModal() {
+    confirmModal.classList.add("hidden");
+    confirmModal.classList.remove("flex");
+  }
+  confirmModalCancel.addEventListener("click", closeConfirmModal);
+  confirmModal.addEventListener("click", function (event) {
+    if (event.target === confirmModal) closeConfirmModal();
+  });
+  confirmModalConfirm.addEventListener("click", function () {
     selection = {};
     renderSelection();
+    closeConfirmModal();
+  });
+
+  viderBtn.addEventListener("click", function () {
+    if (!Object.keys(selection).length) return;
+    openConfirmModal();
   });
 
   // --- Recherche client -------------------------------------------------
