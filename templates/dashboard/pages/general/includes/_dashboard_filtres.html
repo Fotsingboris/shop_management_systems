@@ -1,0 +1,56 @@
+{% comment %}
+Filtre de période, partagé par les 3 modes de dashboard (global/agence/caissier).
+Deux mini-formulaires GET indépendants (rechargent la page avec une nouvelle
+query string) : les pastilles rapides, et la plage personnalisée.
+{% endcomment %}
+<div class="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
+  <div class="flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <p class="mb-1.5 text-xs font-medium text-gray-500">Période</p>
+      <form method="get" class="flex flex-wrap gap-1.5">
+        <button type="submit" name="periode" value="jour"
+          class="rounded-full px-3 py-1.5 text-xs font-medium {% if periode.cle == 'jour' %}bg-primary-800 text-white{% else %}bg-gray-100 text-gray-600 hover:bg-gray-200{% endif %}">
+          Aujourd'hui
+        </button>
+        <button type="submit" name="periode" value="7j"
+          class="rounded-full px-3 py-1.5 text-xs font-medium {% if periode.cle == '7j' %}bg-primary-800 text-white{% else %}bg-gray-100 text-gray-600 hover:bg-gray-200{% endif %}">
+          7 jours
+        </button>
+        <button type="submit" name="periode" value="30j"
+          class="rounded-full px-3 py-1.5 text-xs font-medium {% if periode.cle == '30j' %}bg-primary-800 text-white{% else %}bg-gray-100 text-gray-600 hover:bg-gray-200{% endif %}">
+          30 jours
+        </button>
+        <button type="submit" name="periode" value="mois"
+          class="rounded-full px-3 py-1.5 text-xs font-medium {% if periode.cle == 'mois' %}bg-primary-800 text-white{% else %}bg-gray-100 text-gray-600 hover:bg-gray-200{% endif %}">
+          Ce mois
+        </button>
+        <button type="submit" name="periode" value="tout"
+          class="rounded-full px-3 py-1.5 text-xs font-medium {% if periode.cle == 'tout' %}bg-primary-800 text-white{% else %}bg-gray-100 text-gray-600 hover:bg-gray-200{% endif %}">
+          Tout
+        </button>
+      </form>
+    </div>
+
+    <form method="get" class="flex flex-wrap items-end gap-2">
+      <input type="hidden" name="periode" value="personnalise">
+      <div>
+        <label class="mb-1 block text-[11px] font-medium text-gray-500">Du</label>
+        <input type="date" name="date_debut" value="{{ periode.debut|date:'Y-m-d' }}"
+          class="rounded-lg border border-gray-300 bg-white py-1.5 px-2 text-xs text-gray-700 focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600/20">
+      </div>
+      <div>
+        <label class="mb-1 block text-[11px] font-medium text-gray-500">Au</label>
+        <input type="date" name="date_fin" value="{{ periode.fin|date:'Y-m-d' }}"
+          class="rounded-lg border border-gray-300 bg-white py-1.5 px-2 text-xs text-gray-700 focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600/20">
+      </div>
+      <button type="submit"
+        class="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 {% if periode.cle == 'personnalise' %}ring-2 ring-primary-600/30{% endif %}">
+        Appliquer
+      </button>
+    </form>
+  </div>
+
+  <p class="mt-2 text-xs text-gray-400">
+    {{ periode.label }}{% if periode.debut and periode.fin %} · du {{ periode.debut|date:"d/m/Y" }} au {{ periode.fin|date:"d/m/Y" }}{% endif %}
+  </p>
+</div>

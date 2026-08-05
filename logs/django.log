@@ -266,3 +266,406 @@ django.template.exceptions.TemplateDoesNotExist: sales/pdf/recu.html
 2026-08-05 02:37:19,612 [INFO] django.utils.autoreload - Watching for file changes with StatReloader
 2026-08-05 02:37:47,978 [INFO] django.utils.autoreload - C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\sales\receipts.py changed, reloading.
 2026-08-05 02:38:21,223 [INFO] django.utils.autoreload - Watching for file changes with StatReloader
+2026-08-05 02:39:02,387 [INFO] weasyprint.progress - Step 2 - Fetching and parsing CSS - CSS string
+2026-08-05 02:39:02,861 [INFO] weasyprint.progress - Step 2 - Fetching and parsing CSS - CSS string
+2026-08-05 02:39:02,964 [INFO] weasyprint.progress - Step 2 - Fetching and parsing CSS - CSS string
+2026-08-05 02:39:07,303 [INFO] weasyprint.progress - Step 1 - Fetching and parsing HTML - HTML string
+2026-08-05 02:39:23,684 [INFO] weasyprint.progress - Step 2 - Fetching and parsing CSS - CSS string
+2026-08-05 02:39:24,143 [INFO] weasyprint.progress - Step 3 - Applying CSS
+2026-08-05 02:39:24,248 [INFO] weasyprint.progress - Step 4 - Creating formatting structure
+2026-08-05 02:39:27,840 [INFO] weasyprint.progress - Step 5 - Creating layout - Page 1
+2026-08-05 02:39:30,370 [INFO] weasyprint.progress - Step 6 - Creating PDF
+2026-08-05 02:39:30,730 [INFO] weasyprint.progress - Step 7 - Adding PDF metadata
+2026-08-05 02:39:30,847 [INFO] fontTools.subset - maxp pruned
+2026-08-05 02:39:30,956 [INFO] fontTools.subset - cmap pruned
+2026-08-05 02:39:30,993 [INFO] fontTools.subset - fpgm dropped
+2026-08-05 02:39:31,026 [INFO] fontTools.subset - prep dropped
+2026-08-05 02:39:31,058 [INFO] fontTools.subset - cvt  dropped
+2026-08-05 02:39:31,096 [INFO] fontTools.subset - kern dropped
+2026-08-05 02:39:31,110 [INFO] fontTools.subset - post pruned
+2026-08-05 02:39:31,151 [INFO] fontTools.subset - GPOS dropped
+2026-08-05 02:39:31,162 [INFO] fontTools.subset - GSUB dropped
+2026-08-05 02:39:31,220 [INFO] fontTools.subset - glyf pruned
+2026-08-05 02:39:31,256 [INFO] fontTools.subset - Added gid0 to subset
+2026-08-05 02:39:31,332 [INFO] fontTools.subset - Closing glyph list over 'glyf': 31 glyphs before
+2026-08-05 02:39:31,368 [INFO] fontTools.subset - Glyph names: ['.notdef', 'A', 'B', 'C', 'E', 'Eacute', 'F', 'I', 'L', 'O', 'P', 'Q', 'R', 'T', 'U', 'a', 'c', 'e', 'eight', 'h', 'i', 'l', 'o', 'one', 'period', 'r', 's', 'seven', 'space', 't', 'zero']
+2026-08-05 02:39:31,410 [INFO] fontTools.subset - Glyph IDs:   [0, 3, 17, 19, 20, 26, 27, 36, 37, 38, 40, 41, 44, 47, 50, 51, 52, 53, 55, 56, 68, 70, 72, 75, 76, 79, 82, 85, 86, 87, 139]
+2026-08-05 02:39:31,412 [INFO] fontTools.subset - Closed glyph list over 'glyf': 32 glyphs after
+2026-08-05 02:39:31,414 [INFO] fontTools.subset - Glyph names: ['.notdef', 'A', 'Acute', 'B', 'C', 'E', 'Eacute', 'F', 'I', 'L', 'O', 'P', 'Q', 'R', 'T', 'U', 'a', 'c', 'e', 'eight', 'h', 'i', 'l', 'o', 'one', 'period', 'r', 's', 'seven', 'space', 't', 'zero']
+2026-08-05 02:39:31,429 [INFO] fontTools.subset - Glyph IDs:   [0, 3, 17, 19, 20, 26, 27, 36, 37, 38, 40, 41, 44, 47, 50, 51, 52, 53, 55, 56, 68, 70, 72, 75, 76, 79, 82, 85, 86, 87, 139, 5638]
+2026-08-05 02:39:31,475 [INFO] fontTools.subset - Retaining 32 glyphs
+2026-08-05 02:39:31,494 [INFO] fontTools.subset - head subsetting not needed
+2026-08-05 02:39:31,499 [INFO] fontTools.subset - hhea subsetting not needed
+2026-08-05 02:39:31,512 [INFO] fontTools.subset - maxp subsetting not needed
+2026-08-05 02:39:31,528 [INFO] fontTools.subset - OS/2 subsetting not needed
+2026-08-05 02:39:31,546 [INFO] fontTools.subset - hmtx subsetted
+2026-08-05 02:39:31,576 [INFO] fontTools.subset - cmap subsetted
+2026-08-05 02:39:31,584 [INFO] fontTools.subset - loca subsetting not needed
+2026-08-05 02:39:31,593 [INFO] fontTools.subset - post subsetted
+2026-08-05 02:39:31,605 [INFO] fontTools.subset - gasp subsetting not needed
+2026-08-05 02:39:31,616 [INFO] fontTools.subset - FFTM NOT subset; don't know how to subset
+2026-08-05 02:39:31,655 [INFO] fontTools.subset - GDEF subsetted
+2026-08-05 02:39:31,696 [INFO] fontTools.subset - name subsetting not needed
+2026-08-05 02:39:31,745 [INFO] fontTools.subset - glyf subsetted
+2026-08-05 02:39:31,759 [INFO] fontTools.subset - head pruned
+2026-08-05 02:39:31,767 [INFO] fontTools.subset - OS/2 Unicode ranges pruned: [0, 1]
+2026-08-05 02:39:31,776 [INFO] fontTools.subset - OS/2 CodePage ranges pruned: [0]
+2026-08-05 02:39:31,796 [INFO] fontTools.subset - glyf pruned
+2026-08-05 02:39:31,798 [INFO] fontTools.subset - GDEF pruned
+2026-08-05 02:39:31,814 [INFO] fontTools.subset - name pruned
+2026-08-05 02:39:32,001 [INFO] fontTools.subset - maxp pruned
+2026-08-05 02:39:32,074 [INFO] fontTools.subset - cmap pruned
+2026-08-05 02:39:32,081 [INFO] fontTools.subset - fpgm dropped
+2026-08-05 02:39:32,090 [INFO] fontTools.subset - prep dropped
+2026-08-05 02:39:32,106 [INFO] fontTools.subset - cvt  dropped
+2026-08-05 02:39:32,113 [INFO] fontTools.subset - kern dropped
+2026-08-05 02:39:32,131 [INFO] fontTools.subset - post pruned
+2026-08-05 02:39:32,145 [INFO] fontTools.subset - GPOS dropped
+2026-08-05 02:39:32,160 [INFO] fontTools.subset - GSUB dropped
+2026-08-05 02:39:32,200 [INFO] fontTools.subset - glyf pruned
+2026-08-05 02:39:32,221 [INFO] fontTools.subset - Added gid0 to subset
+2026-08-05 02:39:32,223 [INFO] fontTools.subset - Closing glyph list over 'glyf': 51 glyphs before
+2026-08-05 02:39:32,230 [INFO] fontTools.subset - Glyph names: ['.notdef', 'A', 'C', 'D', 'E', 'F', 'N', 'P', 'R', 'S', 'T', 'a', 'b', 'c', 'ccedilla', 'colon', 'd', 'degree', 'e', 'eacute', 'egrave', 'eight', 'f', 'five', 'four', 'g', 'hyphen', 'i', 'k', 'l', 'm', 'n', 'nine', 'o', 'one', 'p', 'period', 'plus', 'r', 's', 'seven', 'six', 'slash', 'space', 't', 'three', 'two', 'u', 'x', 'z', 'zero']
+2026-08-05 02:39:32,246 [INFO] fontTools.subset - Glyph IDs:   [0, 3, 14, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 36, 38, 39, 40, 41, 49, 51, 53, 54, 55, 68, 69, 70, 71, 72, 73, 74, 76, 78, 79, 80, 81, 82, 83, 85, 86, 87, 88, 91, 93, 114, 169, 170, 171]
+2026-08-05 02:39:32,247 [INFO] fontTools.subset - Closed glyph list over 'glyf': 54 glyphs after
+2026-08-05 02:39:32,256 [INFO] fontTools.subset - Glyph names: ['.notdef', 'A', 'C', 'D', 'E', 'F', 'N', 'P', 'R', 'S', 'T', 'a', 'acute', 'b', 'c', 'ccedilla', 'cedilla', 'colon', 'd', 'degree', 'e', 'eacute', 'egrave', 'eight', 'f', 'five', 'four', 'g', 'grave', 'hyphen', 'i', 'k', 'l', 'm', 'n', 'nine', 'o', 'one', 'p', 'period', 'plus', 'r', 's', 'seven', 'six', 'slash', 'space', 't', 'three', 'two', 'u', 'x', 'z', 'zero']
+2026-08-05 02:39:32,258 [INFO] fontTools.subset - Glyph IDs:   [0, 3, 14, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 36, 38, 39, 40, 41, 49, 51, 53, 54, 55, 67, 68, 69, 70, 71, 72, 73, 74, 76, 78, 79, 80, 81, 82, 83, 85, 86, 87, 88, 91, 93, 114, 118, 122, 169, 170, 171]
+2026-08-05 02:39:32,281 [INFO] fontTools.subset - Retaining 54 glyphs
+2026-08-05 02:39:32,307 [INFO] fontTools.subset - head subsetting not needed
+2026-08-05 02:39:32,361 [INFO] fontTools.subset - hhea subsetting not needed
+2026-08-05 02:39:32,417 [INFO] fontTools.subset - maxp subsetting not needed
+2026-08-05 02:39:32,427 [INFO] fontTools.subset - OS/2 subsetting not needed
+2026-08-05 02:39:32,444 [INFO] fontTools.subset - hmtx subsetted
+2026-08-05 02:39:32,471 [INFO] fontTools.subset - cmap subsetted
+2026-08-05 02:39:32,476 [INFO] fontTools.subset - loca subsetting not needed
+2026-08-05 02:39:32,491 [INFO] fontTools.subset - post subsetted
+2026-08-05 02:39:32,492 [INFO] fontTools.subset - gasp subsetting not needed
+2026-08-05 02:39:32,499 [INFO] fontTools.subset - FFTM NOT subset; don't know how to subset
+2026-08-05 02:39:32,531 [INFO] fontTools.subset - GDEF subsetted
+2026-08-05 02:39:32,542 [INFO] fontTools.subset - name subsetting not needed
+2026-08-05 02:39:32,549 [INFO] fontTools.subset - glyf subsetted
+2026-08-05 02:39:32,559 [INFO] fontTools.subset - head pruned
+2026-08-05 02:39:32,566 [INFO] fontTools.subset - OS/2 Unicode ranges pruned: [0, 1]
+2026-08-05 02:39:32,582 [INFO] fontTools.subset - OS/2 CodePage ranges pruned: [0]
+2026-08-05 02:39:32,593 [INFO] fontTools.subset - glyf pruned
+2026-08-05 02:39:32,610 [INFO] fontTools.subset - GDEF pruned
+2026-08-05 02:39:32,614 [INFO] fontTools.subset - name pruned
+2026-08-05 02:40:44,258 [INFO] weasyprint.progress - Step 1 - Fetching and parsing HTML - HTML string
+2026-08-05 02:40:49,390 [INFO] weasyprint.progress - Step 2 - Fetching and parsing CSS - CSS string
+2026-08-05 02:40:49,492 [INFO] weasyprint.progress - Step 3 - Applying CSS
+2026-08-05 02:40:49,582 [INFO] weasyprint.progress - Step 4 - Creating formatting structure
+2026-08-05 02:40:49,747 [INFO] weasyprint.progress - Step 5 - Creating layout - Page 1
+2026-08-05 02:40:50,680 [INFO] weasyprint.progress - Step 6 - Creating PDF
+2026-08-05 02:40:50,966 [INFO] weasyprint.progress - Step 7 - Adding PDF metadata
+2026-08-05 02:40:51,150 [INFO] fontTools.subset - maxp pruned
+2026-08-05 02:40:51,477 [INFO] fontTools.subset - cmap pruned
+2026-08-05 02:40:51,591 [INFO] fontTools.subset - fpgm dropped
+2026-08-05 02:40:51,630 [INFO] fontTools.subset - prep dropped
+2026-08-05 02:40:51,780 [INFO] fontTools.subset - cvt  dropped
+2026-08-05 02:40:51,865 [INFO] fontTools.subset - kern dropped
+2026-08-05 02:40:51,925 [INFO] fontTools.subset - post pruned
+2026-08-05 02:40:51,967 [INFO] fontTools.subset - GPOS dropped
+2026-08-05 02:40:52,014 [INFO] fontTools.subset - GSUB dropped
+2026-08-05 02:40:52,139 [INFO] fontTools.subset - glyf pruned
+2026-08-05 02:40:52,150 [INFO] fontTools.subset - Added gid0 to subset
+2026-08-05 02:40:52,158 [INFO] fontTools.subset - Closing glyph list over 'glyf': 30 glyphs before
+2026-08-05 02:40:52,164 [INFO] fontTools.subset - Glyph names: ['.notdef', 'A', 'B', 'C', 'E', 'Eacute', 'F', 'I', 'L', 'O', 'P', 'Q', 'R', 'T', 'U', 'a', 'c', 'e', 'five', 'h', 'i', 'l', 'o', 'one', 'period', 'r', 's', 'space', 't', 'zero']
+2026-08-05 02:40:52,224 [INFO] fontTools.subset - Glyph IDs:   [0, 3, 17, 19, 20, 24, 36, 37, 38, 40, 41, 44, 47, 50, 51, 52, 53, 55, 56, 68, 70, 72, 75, 76, 79, 82, 85, 86, 87, 139]
+2026-08-05 02:40:52,255 [INFO] fontTools.subset - Closed glyph list over 'glyf': 31 glyphs after
+2026-08-05 02:40:52,276 [INFO] fontTools.subset - Glyph names: ['.notdef', 'A', 'Acute', 'B', 'C', 'E', 'Eacute', 'F', 'I', 'L', 'O', 'P', 'Q', 'R', 'T', 'U', 'a', 'c', 'e', 'five', 'h', 'i', 'l', 'o', 'one', 'period', 'r', 's', 'space', 't', 'zero']
+2026-08-05 02:40:52,281 [INFO] fontTools.subset - Glyph IDs:   [0, 3, 17, 19, 20, 24, 36, 37, 38, 40, 41, 44, 47, 50, 51, 52, 53, 55, 56, 68, 70, 72, 75, 76, 79, 82, 85, 86, 87, 139, 5638]
+2026-08-05 02:40:52,339 [INFO] fontTools.subset - Retaining 31 glyphs
+2026-08-05 02:40:52,344 [INFO] fontTools.subset - head subsetting not needed
+2026-08-05 02:40:52,345 [INFO] fontTools.subset - hhea subsetting not needed
+2026-08-05 02:40:52,346 [INFO] fontTools.subset - maxp subsetting not needed
+2026-08-05 02:40:52,349 [INFO] fontTools.subset - OS/2 subsetting not needed
+2026-08-05 02:40:53,250 [INFO] fontTools.subset - hmtx subsetted
+2026-08-05 02:40:53,324 [INFO] fontTools.subset - cmap subsetted
+2026-08-05 02:40:53,346 [INFO] fontTools.subset - loca subsetting not needed
+2026-08-05 02:40:53,392 [INFO] fontTools.subset - post subsetted
+2026-08-05 02:40:53,445 [INFO] fontTools.subset - gasp subsetting not needed
+2026-08-05 02:40:53,451 [INFO] fontTools.subset - FFTM NOT subset; don't know how to subset
+2026-08-05 02:40:53,487 [INFO] fontTools.subset - GDEF subsetted
+2026-08-05 02:40:53,511 [INFO] fontTools.subset - name subsetting not needed
+2026-08-05 02:40:53,539 [INFO] fontTools.subset - glyf subsetted
+2026-08-05 02:40:53,548 [INFO] fontTools.subset - head pruned
+2026-08-05 02:40:53,592 [INFO] fontTools.subset - OS/2 Unicode ranges pruned: [0, 1]
+2026-08-05 02:40:53,616 [INFO] fontTools.subset - OS/2 CodePage ranges pruned: [0]
+2026-08-05 02:40:53,636 [INFO] fontTools.subset - glyf pruned
+2026-08-05 02:40:53,648 [INFO] fontTools.subset - GDEF pruned
+2026-08-05 02:40:53,664 [INFO] fontTools.subset - name pruned
+2026-08-05 02:40:53,951 [INFO] fontTools.subset - maxp pruned
+2026-08-05 02:40:54,028 [INFO] fontTools.subset - cmap pruned
+2026-08-05 02:40:54,043 [INFO] fontTools.subset - fpgm dropped
+2026-08-05 02:40:54,045 [INFO] fontTools.subset - prep dropped
+2026-08-05 02:40:54,048 [INFO] fontTools.subset - cvt  dropped
+2026-08-05 02:40:54,110 [INFO] fontTools.subset - kern dropped
+2026-08-05 02:40:54,122 [INFO] fontTools.subset - post pruned
+2026-08-05 02:40:54,168 [INFO] fontTools.subset - GPOS dropped
+2026-08-05 02:40:54,199 [INFO] fontTools.subset - GSUB dropped
+2026-08-05 02:40:54,262 [INFO] fontTools.subset - glyf pruned
+2026-08-05 02:40:54,340 [INFO] fontTools.subset - Added gid0 to subset
+2026-08-05 02:40:54,384 [INFO] fontTools.subset - Closing glyph list over 'glyf': 47 glyphs before
+2026-08-05 02:40:54,392 [INFO] fontTools.subset - Glyph names: ['.notdef', 'A', 'C', 'D', 'E', 'F', 'N', 'P', 'R', 'S', 'T', 'a', 'b', 'c', 'ccedilla', 'colon', 'd', 'degree', 'e', 'egrave', 'eight', 'f', 'five', 'four', 'g', 'hyphen', 'i', 'l', 'm', 'n', 'nine', 'o', 'one', 'p', 'period', 'plus', 'r', 's', 'six', 'slash', 'space', 't', 'two', 'u', 'x', 'y', 'zero']
+2026-08-05 02:40:54,414 [INFO] fontTools.subset - Glyph IDs:   [0, 3, 14, 16, 17, 18, 19, 20, 21, 23, 24, 25, 27, 28, 29, 36, 38, 39, 40, 41, 49, 51, 53, 54, 55, 68, 69, 70, 71, 72, 73, 74, 76, 79, 80, 81, 82, 83, 85, 86, 87, 88, 91, 92, 114, 169, 170]
+2026-08-05 02:40:54,427 [INFO] fontTools.subset - Closed glyph list over 'glyf': 49 glyphs after
+2026-08-05 02:40:54,430 [INFO] fontTools.subset - Glyph names: ['.notdef', 'A', 'C', 'D', 'E', 'F', 'N', 'P', 'R', 'S', 'T', 'a', 'b', 'c', 'ccedilla', 'cedilla', 'colon', 'd', 'degree', 'e', 'egrave', 'eight', 'f', 'five', 'four', 'g', 'grave', 'hyphen', 'i', 'l', 'm', 'n', 'nine', 'o', 'one', 'p', 'period', 'plus', 'r', 's', 'six', 'slash', 'space', 't', 'two', 'u', 'x', 'y', 'zero']
+2026-08-05 02:40:54,448 [INFO] fontTools.subset - Glyph IDs:   [0, 3, 14, 16, 17, 18, 19, 20, 21, 23, 24, 25, 27, 28, 29, 36, 38, 39, 40, 41, 49, 51, 53, 54, 55, 67, 68, 69, 70, 71, 72, 73, 74, 76, 79, 80, 81, 82, 83, 85, 86, 87, 88, 91, 92, 114, 122, 169, 170]
+2026-08-05 02:40:54,472 [INFO] fontTools.subset - Retaining 49 glyphs
+2026-08-05 02:40:54,484 [INFO] fontTools.subset - head subsetting not needed
+2026-08-05 02:40:54,494 [INFO] fontTools.subset - hhea subsetting not needed
+2026-08-05 02:40:54,609 [INFO] fontTools.subset - maxp subsetting not needed
+2026-08-05 02:40:54,674 [INFO] fontTools.subset - OS/2 subsetting not needed
+2026-08-05 02:40:54,751 [INFO] fontTools.subset - hmtx subsetted
+2026-08-05 02:40:54,794 [INFO] fontTools.subset - cmap subsetted
+2026-08-05 02:40:54,812 [INFO] fontTools.subset - loca subsetting not needed
+2026-08-05 02:40:54,814 [INFO] fontTools.subset - post subsetted
+2026-08-05 02:40:54,817 [INFO] fontTools.subset - gasp subsetting not needed
+2026-08-05 02:40:54,830 [INFO] fontTools.subset - FFTM NOT subset; don't know how to subset
+2026-08-05 02:40:54,843 [INFO] fontTools.subset - GDEF subsetted
+2026-08-05 02:40:54,895 [INFO] fontTools.subset - name subsetting not needed
+2026-08-05 02:40:54,941 [INFO] fontTools.subset - glyf subsetted
+2026-08-05 02:40:54,951 [INFO] fontTools.subset - head pruned
+2026-08-05 02:40:54,996 [INFO] fontTools.subset - OS/2 Unicode ranges pruned: [0, 1]
+2026-08-05 02:40:55,052 [INFO] fontTools.subset - OS/2 CodePage ranges pruned: [0]
+2026-08-05 02:40:55,060 [INFO] fontTools.subset - glyf pruned
+2026-08-05 02:40:55,063 [INFO] fontTools.subset - GDEF pruned
+2026-08-05 02:40:55,066 [INFO] fontTools.subset - name pruned
+2026-08-05 03:05:18,773 [INFO] django.utils.autoreload - C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\general\views\admin_dashboard.py changed, reloading.
+2026-08-05 03:05:53,824 [INFO] django.utils.autoreload - Watching for file changes with StatReloader
+2026-08-05 03:12:20,829 [INFO] django.utils.autoreload - C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\general\views\admin_dashboard.py changed, reloading.
+2026-08-05 03:12:43,857 [INFO] django.utils.autoreload - Watching for file changes with StatReloader
+2026-08-05 03:39:41,059 [WARNING] django.request - Not Found: /
+2026-08-05 03:39:41,187 [WARNING] django.request - Not Found: /favicon.ico
+2026-08-05 03:40:11,334 [WARNING] django.request - Not Found: /general.dashboard
+2026-08-05 03:40:18,302 [WARNING] django.request - Not Found: /general/dashboard
+2026-08-05 03:40:23,969 [WARNING] django.request - Not Found: /general/dashboard/
+2026-08-05 04:08:54,982 [WARNING] django.request - Forbidden (Permission denied): /generaldashboard/
+Traceback (most recent call last):
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\views\generic\base.py", line 105, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\contrib\auth\mixins.py", line 73, in dispatch
+    return super().dispatch(request, *args, **kwargs)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\contrib\auth\mixins.py", line 134, in dispatch
+    return self.handle_no_permission()
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\contrib\auth\mixins.py", line 48, in handle_no_permission
+    raise PermissionDenied(self.get_permission_denied_message())
+django.core.exceptions.PermissionDenied
+2026-08-05 04:09:00,417 [WARNING] django.request - Forbidden (Permission denied): /generaldashboard/
+Traceback (most recent call last):
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\views\generic\base.py", line 105, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\contrib\auth\mixins.py", line 73, in dispatch
+    return super().dispatch(request, *args, **kwargs)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\contrib\auth\mixins.py", line 134, in dispatch
+    return self.handle_no_permission()
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\contrib\auth\mixins.py", line 48, in handle_no_permission
+    raise PermissionDenied(self.get_permission_denied_message())
+django.core.exceptions.PermissionDenied
+2026-08-05 04:09:52,914 [INFO] weasyprint.progress - Step 2 - Fetching and parsing CSS - CSS string
+2026-08-05 04:09:53,023 [INFO] weasyprint.progress - Step 2 - Fetching and parsing CSS - CSS string
+2026-08-05 04:09:53,026 [INFO] weasyprint.progress - Step 2 - Fetching and parsing CSS - CSS string
+2026-08-05 04:09:53,493 [INFO] weasyprint.progress - Step 1 - Fetching and parsing HTML - HTML string
+2026-08-05 04:09:55,033 [INFO] weasyprint.progress - Step 2 - Fetching and parsing CSS - CSS string
+2026-08-05 04:09:55,040 [INFO] weasyprint.progress - Step 3 - Applying CSS
+2026-08-05 04:09:55,047 [INFO] weasyprint.progress - Step 4 - Creating formatting structure
+2026-08-05 04:09:55,096 [INFO] weasyprint.progress - Step 5 - Creating layout - Page 1
+2026-08-05 04:09:55,231 [INFO] weasyprint.progress - Step 6 - Creating PDF
+2026-08-05 04:09:55,285 [INFO] weasyprint.progress - Step 7 - Adding PDF metadata
+2026-08-05 04:09:55,291 [INFO] fontTools.subset - maxp pruned
+2026-08-05 04:09:55,308 [INFO] fontTools.subset - cmap pruned
+2026-08-05 04:09:55,308 [INFO] fontTools.subset - fpgm dropped
+2026-08-05 04:09:55,309 [INFO] fontTools.subset - prep dropped
+2026-08-05 04:09:55,309 [INFO] fontTools.subset - cvt  dropped
+2026-08-05 04:09:55,309 [INFO] fontTools.subset - kern dropped
+2026-08-05 04:09:55,310 [INFO] fontTools.subset - post pruned
+2026-08-05 04:09:55,313 [INFO] fontTools.subset - GPOS dropped
+2026-08-05 04:09:55,314 [INFO] fontTools.subset - GSUB dropped
+2026-08-05 04:09:55,325 [INFO] fontTools.subset - glyf pruned
+2026-08-05 04:09:55,331 [INFO] fontTools.subset - Added gid0 to subset
+2026-08-05 04:09:55,332 [INFO] fontTools.subset - Closing glyph list over 'glyf': 30 glyphs before
+2026-08-05 04:09:55,332 [INFO] fontTools.subset - Glyph names: ['.notdef', 'A', 'B', 'C', 'E', 'Eacute', 'F', 'I', 'L', 'O', 'P', 'Q', 'R', 'T', 'U', 'a', 'c', 'e', 'h', 'i', 'l', 'nine', 'o', 'period', 'r', 's', 'six', 'space', 't', 'zero']
+2026-08-05 04:09:55,334 [INFO] fontTools.subset - Glyph IDs:   [0, 3, 17, 19, 25, 28, 36, 37, 38, 40, 41, 44, 47, 50, 51, 52, 53, 55, 56, 68, 70, 72, 75, 76, 79, 82, 85, 86, 87, 139]
+2026-08-05 04:09:55,335 [INFO] fontTools.subset - Closed glyph list over 'glyf': 31 glyphs after
+2026-08-05 04:09:55,335 [INFO] fontTools.subset - Glyph names: ['.notdef', 'A', 'Acute', 'B', 'C', 'E', 'Eacute', 'F', 'I', 'L', 'O', 'P', 'Q', 'R', 'T', 'U', 'a', 'c', 'e', 'h', 'i', 'l', 'nine', 'o', 'period', 'r', 's', 'six', 'space', 't', 'zero']
+2026-08-05 04:09:55,335 [INFO] fontTools.subset - Glyph IDs:   [0, 3, 17, 19, 25, 28, 36, 37, 38, 40, 41, 44, 47, 50, 51, 52, 53, 55, 56, 68, 70, 72, 75, 76, 79, 82, 85, 86, 87, 139, 5638]
+2026-08-05 04:09:55,349 [INFO] fontTools.subset - Retaining 31 glyphs
+2026-08-05 04:09:55,351 [INFO] fontTools.subset - head subsetting not needed
+2026-08-05 04:09:55,351 [INFO] fontTools.subset - hhea subsetting not needed
+2026-08-05 04:09:55,352 [INFO] fontTools.subset - maxp subsetting not needed
+2026-08-05 04:09:55,353 [INFO] fontTools.subset - OS/2 subsetting not needed
+2026-08-05 04:09:55,366 [INFO] fontTools.subset - hmtx subsetted
+2026-08-05 04:09:55,372 [INFO] fontTools.subset - cmap subsetted
+2026-08-05 04:09:55,373 [INFO] fontTools.subset - loca subsetting not needed
+2026-08-05 04:09:55,374 [INFO] fontTools.subset - post subsetted
+2026-08-05 04:09:55,375 [INFO] fontTools.subset - gasp subsetting not needed
+2026-08-05 04:09:55,376 [INFO] fontTools.subset - FFTM NOT subset; don't know how to subset
+2026-08-05 04:09:55,381 [INFO] fontTools.subset - GDEF subsetted
+2026-08-05 04:09:55,383 [INFO] fontTools.subset - name subsetting not needed
+2026-08-05 04:09:55,394 [INFO] fontTools.subset - glyf subsetted
+2026-08-05 04:09:55,395 [INFO] fontTools.subset - head pruned
+2026-08-05 04:09:55,397 [INFO] fontTools.subset - OS/2 Unicode ranges pruned: [0, 1]
+2026-08-05 04:09:55,400 [INFO] fontTools.subset - OS/2 CodePage ranges pruned: [0]
+2026-08-05 04:09:55,403 [INFO] fontTools.subset - glyf pruned
+2026-08-05 04:09:55,405 [INFO] fontTools.subset - GDEF pruned
+2026-08-05 04:09:55,409 [INFO] fontTools.subset - name pruned
+2026-08-05 04:09:55,610 [INFO] fontTools.subset - maxp pruned
+2026-08-05 04:09:55,647 [INFO] fontTools.subset - cmap pruned
+2026-08-05 04:09:55,649 [INFO] fontTools.subset - fpgm dropped
+2026-08-05 04:09:55,651 [INFO] fontTools.subset - prep dropped
+2026-08-05 04:09:55,653 [INFO] fontTools.subset - cvt  dropped
+2026-08-05 04:09:55,654 [INFO] fontTools.subset - kern dropped
+2026-08-05 04:09:55,657 [INFO] fontTools.subset - post pruned
+2026-08-05 04:09:55,659 [INFO] fontTools.subset - GPOS dropped
+2026-08-05 04:09:55,660 [INFO] fontTools.subset - GSUB dropped
+2026-08-05 04:09:55,680 [INFO] fontTools.subset - glyf pruned
+2026-08-05 04:09:55,684 [INFO] fontTools.subset - Added gid0 to subset
+2026-08-05 04:09:55,685 [INFO] fontTools.subset - Closing glyph list over 'glyf': 47 glyphs before
+2026-08-05 04:09:55,686 [INFO] fontTools.subset - Glyph names: ['.notdef', 'A', 'B', 'C', 'D', 'E', 'F', 'N', 'P', 'R', 'S', 'T', 'a', 'b', 'c', 'ccedilla', 'colon', 'd', 'degree', 'e', 'egrave', 'eight', 'f', 'five', 'g', 'hyphen', 'i', 'l', 'm', 'n', 'nine', 'o', 'one', 'p', 'period', 'plus', 'r', 's', 'six', 'slash', 'space', 't', 'three', 'two', 'u', 'x', 'zero']
+2026-08-05 04:09:55,688 [INFO] fontTools.subset - Glyph IDs:   [0, 3, 14, 16, 17, 18, 19, 20, 21, 22, 24, 25, 27, 28, 29, 36, 37, 38, 39, 40, 41, 49, 51, 53, 54, 55, 68, 69, 70, 71, 72, 73, 74, 76, 79, 80, 81, 82, 83, 85, 86, 87, 88, 91, 114, 169, 170]
+2026-08-05 04:09:55,689 [INFO] fontTools.subset - Closed glyph list over 'glyf': 49 glyphs after
+2026-08-05 04:09:55,690 [INFO] fontTools.subset - Glyph names: ['.notdef', 'A', 'B', 'C', 'D', 'E', 'F', 'N', 'P', 'R', 'S', 'T', 'a', 'b', 'c', 'ccedilla', 'cedilla', 'colon', 'd', 'degree', 'e', 'egrave', 'eight', 'f', 'five', 'g', 'grave', 'hyphen', 'i', 'l', 'm', 'n', 'nine', 'o', 'one', 'p', 'period', 'plus', 'r', 's', 'six', 'slash', 'space', 't', 'three', 'two', 'u', 'x', 'zero']
+2026-08-05 04:09:55,691 [INFO] fontTools.subset - Glyph IDs:   [0, 3, 14, 16, 17, 18, 19, 20, 21, 22, 24, 25, 27, 28, 29, 36, 37, 38, 39, 40, 41, 49, 51, 53, 54, 55, 67, 68, 69, 70, 71, 72, 73, 74, 76, 79, 80, 81, 82, 83, 85, 86, 87, 88, 91, 114, 122, 169, 170]
+2026-08-05 04:09:55,699 [INFO] fontTools.subset - Retaining 49 glyphs
+2026-08-05 04:09:55,701 [INFO] fontTools.subset - head subsetting not needed
+2026-08-05 04:09:55,702 [INFO] fontTools.subset - hhea subsetting not needed
+2026-08-05 04:09:55,703 [INFO] fontTools.subset - maxp subsetting not needed
+2026-08-05 04:09:55,704 [INFO] fontTools.subset - OS/2 subsetting not needed
+2026-08-05 04:09:55,714 [INFO] fontTools.subset - hmtx subsetted
+2026-08-05 04:09:55,721 [INFO] fontTools.subset - cmap subsetted
+2026-08-05 04:09:55,722 [INFO] fontTools.subset - loca subsetting not needed
+2026-08-05 04:09:55,723 [INFO] fontTools.subset - post subsetted
+2026-08-05 04:09:55,724 [INFO] fontTools.subset - gasp subsetting not needed
+2026-08-05 04:09:55,725 [INFO] fontTools.subset - FFTM NOT subset; don't know how to subset
+2026-08-05 04:09:55,731 [INFO] fontTools.subset - GDEF subsetted
+2026-08-05 04:09:55,732 [INFO] fontTools.subset - name subsetting not needed
+2026-08-05 04:09:55,738 [INFO] fontTools.subset - glyf subsetted
+2026-08-05 04:09:55,742 [INFO] fontTools.subset - head pruned
+2026-08-05 04:09:55,744 [INFO] fontTools.subset - OS/2 Unicode ranges pruned: [0, 1]
+2026-08-05 04:09:55,745 [INFO] fontTools.subset - OS/2 CodePage ranges pruned: [0]
+2026-08-05 04:09:55,746 [INFO] fontTools.subset - glyf pruned
+2026-08-05 04:09:55,747 [INFO] fontTools.subset - GDEF pruned
+2026-08-05 04:09:55,751 [INFO] fontTools.subset - name pruned
+2026-08-05 09:56:26,845 [ERROR] django.request - Internal Server Error: /sales/ventes/nouvelle/
+Traceback (most recent call last):
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\redis\connection.py", line 1055, in connect_check_health
+    sock = self._connect()
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\redis\connection.py", line 1617, in _connect
+    raise err
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\redis\connection.py", line 1601, in _connect
+    sock.connect(socket_address)
+ConnectionRefusedError: [WinError 10061] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\views\generic\base.py", line 105, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\contrib\auth\mixins.py", line 73, in dispatch
+    return super().dispatch(request, *args, **kwargs)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\contrib\auth\mixins.py", line 135, in dispatch
+    return super().dispatch(request, *args, **kwargs)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\views\generic\base.py", line 144, in dispatch
+    return handler(request, *args, **kwargs)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\views\generic\base.py", line 228, in get
+    context = self.get_context_data(**kwargs)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\sales\views\pos_views.py", line 204, in get_context_data
+    context["categories"] = get_categories_actives()
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\products\services.py", line 36, in get_categories_actives
+    categories = cache.get(CATEGORIES_ACTIVES_CACHE_KEY)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\core\cache\backends\redis.py", line 188, in get
+    return self._cache.get(key, default)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\core\cache\backends\redis.py", line 100, in get
+    value = client.get(key)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\redis\commands\core.py", line 3200, in get
+    return self.execute_command("GET", name, keys=[name])
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\redis\client.py", line 867, in execute_command
+    return self._execute_command(*args, **options)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\redis\client.py", line 873, in _execute_command
+    conn = self.connection or pool.get_connection()
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\redis\utils.py", line 258, in wrapper
+    return func(*args, **kwargs)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\redis\connection.py", line 3273, in get_connection
+    connection.connect()
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\redis\connection.py", line 1028, in connect
+    self.retry.call_with_retry(
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\redis\retry.py", line 132, in call_with_retry
+    raise error
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\redis\retry.py", line 120, in call_with_retry
+    return do()
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\redis\connection.py", line 1029, in <lambda>
+    lambda: self.connect_check_health(
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\redis\connection.py", line 1077, in connect_check_health
+    raise e
+redis.exceptions.ConnectionError: Error 10061 connecting to 127.0.0.1:6379. Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée.
+2026-08-05 09:56:49,062 [INFO] django.utils.autoreload - Watching for file changes with StatReloader
+2026-08-05 09:56:56,989 [ERROR] django.request - Internal Server Error: /sales/ventes/nouvelle/
+Traceback (most recent call last):
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\redis\connection.py", line 1055, in connect_check_health
+    sock = self._connect()
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\redis\connection.py", line 1617, in _connect
+    raise err
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\redis\connection.py", line 1601, in _connect
+    sock.connect(socket_address)
+ConnectionRefusedError: [WinError 10061] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\views\generic\base.py", line 105, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\contrib\auth\mixins.py", line 73, in dispatch
+    return super().dispatch(request, *args, **kwargs)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\contrib\auth\mixins.py", line 135, in dispatch
+    return super().dispatch(request, *args, **kwargs)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\views\generic\base.py", line 144, in dispatch
+    return handler(request, *args, **kwargs)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\views\generic\base.py", line 228, in get
+    context = self.get_context_data(**kwargs)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\sales\views\pos_views.py", line 204, in get_context_data
+    context["categories"] = get_categories_actives()
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\products\services.py", line 36, in get_categories_actives
+    categories = cache.get(CATEGORIES_ACTIVES_CACHE_KEY)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\core\cache\backends\redis.py", line 188, in get
+    return self._cache.get(key, default)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\core\cache\backends\redis.py", line 100, in get
+    value = client.get(key)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\redis\commands\core.py", line 3200, in get
+    return self.execute_command("GET", name, keys=[name])
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\redis\client.py", line 867, in execute_command
+    return self._execute_command(*args, **options)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\redis\client.py", line 873, in _execute_command
+    conn = self.connection or pool.get_connection()
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\redis\utils.py", line 258, in wrapper
+    return func(*args, **kwargs)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\redis\connection.py", line 3273, in get_connection
+    connection.connect()
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\redis\connection.py", line 1028, in connect
+    self.retry.call_with_retry(
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\redis\retry.py", line 132, in call_with_retry
+    raise error
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\redis\retry.py", line 120, in call_with_retry
+    return do()
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\redis\connection.py", line 1029, in <lambda>
+    lambda: self.connect_check_health(
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\redis\connection.py", line 1077, in connect_check_health
+    raise e
+redis.exceptions.ConnectionError: Error 10061 connecting to 127.0.0.1:6379. Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée.
+2026-08-05 09:57:56,022 [WARNING] django.request - Not Found: /favicon.ico
+2026-08-05 09:58:26,104 [WARNING] django.request - Not Found: /favicon.ico
