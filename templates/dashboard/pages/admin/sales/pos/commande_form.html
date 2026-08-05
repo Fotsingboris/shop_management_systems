@@ -1,0 +1,549 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Point de vente{% endblock %}
+{% block page_title %}Point de vente{% endblock %}
+
+{% block content %}
+<div class="space-y-4">
+
+  {% if messages %}
+    <div class="space-y-2">
+      {% for message in messages %}
+        <div class="rounded-lg border px-4 py-2.5 text-sm
+          {% if message.tags == 'success' %}border-green-200 bg-green-50 text-green-800
+          {% elif message.tags == 'warning' %}border-amber-200 bg-amber-50 text-amber-800
+          {% elif message.tags == 'error' %}border-red-200 bg-red-50 text-red-700
+          {% else %}border-blue-200 bg-blue-50 text-blue-800{% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {% if not a_une_agence_disponible %}
+    <div class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+      {% if agence_selectionnable %}
+        Aucune agence active disponible pour votre compte. Contactez un administrateur si vous pensez
+        que c'est une erreur.
+      {% else %}
+        Votre compte n'est rattaché à aucune agence active : vous ne pouvez pas encaisser de vente pour
+        le moment. Contactez un administrateur.
+      {% endif %}
+    </div>
+  {% else %}
+    <form method="post" id="commande-form" novalidate>
+      {% csrf_token %}
+      <input type="hidden" name="entries_json" id="entries-json-input" value="[]">
+
+      <div class="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_360px]">
+
+        <!-- ============== Colonne gauche : catalogue ============== -->
+        <div class="rounded-xl border border-gray-100 bg-white shadow-sm">
+          <div class="space-y-3 border-b border-gray-100 p-4">
+            <div class="flex flex-wrap items-center gap-3">
+              <div class="relative flex-1 min-w-[220px]">
+                <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                  <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
+                </span>
+                <input type="text" id="pos-search-input" autocomplete="off"
+                  placeholder="Rechercher un produit (nom ou SKU)…"
+                  class="block w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-9 pr-9 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600/30">
+                <button type="button" id="pos-search-clear"
+                  class="absolute inset-y-0 right-0 hidden items-center pr-3 text-gray-400 hover:text-gray-600">
+                  <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+              </div>
+
+              {% if agence_selectionnable %}
+                <div class="min-w-[200px]">
+                  <label for="{{ form.agence.id_for_label }}" class="sr-only">{{ form.agence.label }}</label>
+                  {{ form.agence }}
+                  {% if form.agence.errors %}<p class="mt-1 text-xs text-red-600">{{ form.agence.errors.0 }}</p>{% endif %}
+                </div>
+              {% endif %}
+            </div>
+
+            <!-- Filtre par catégorie -->
+            <div id="pos-category-chips" class="flex flex-wrap gap-2">
+              <button type="button" data-categorie-id=""
+                class="pos-category-chip rounded-full px-3 py-1 text-xs font-medium bg-primary-800 text-white hover:bg-primary-900">
+                Toutes les catégories
+              </button>
+              {% for categorie in categories %}
+                <button type="button" data-categorie-id="{{ categorie.pk }}"
+                  class="pos-category-chip rounded-full px-3 py-1 text-xs font-medium bg-gray-100 text-gray-600 hover:bg-gray-200">
+                  {{ categorie.nom }}
+                </button>
+              {% endfor %}
+            </div>
+
+            <p id="pos-results-count" class="text-xs text-gray-400"></p>
+          </div>
+
+          <div class="max-h-[70vh] overflow-y-auto p-4">
+            <div id="pos-product-grid" class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3"></div>
+            <div id="pos-grid-empty" class="hidden rounded-lg border border-dashed border-gray-200 px-4 py-10 text-center text-sm text-gray-400">
+              Aucun produit disponible pour cette recherche.
+            </div>
+          </div>
+        </div>
+
+        <!-- ============== Colonne droite : panier / encaissement ============== -->
+        <div class="space-y-4 lg:sticky lg:top-6 lg:self-start">
+
+          <!-- Client -->
+          <div class="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
+            <div class="mb-2 flex items-center gap-2 text-sm font-semibold text-gray-900">
+              <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
+              Client
+            </div>
+
+            <div id="pos-client-chip" class="mb-2 hidden inline-flex items-center gap-2 rounded-full bg-primary-50 px-3 py-1 text-xs font-medium text-primary-800">
+              <span id="pos-client-chip-label"></span>
+              <button type="button" id="pos-client-chip-remove" class="text-primary-500 hover:text-primary-700">✕</button>
+            </div>
+
+            <div id="pos-client-fields" class="relative space-y-2">
+              <div class="relative">
+                {{ form.client_telephone }}
+                <div id="client-search-results"
+                  class="absolute z-10 mt-1 hidden max-h-48 w-full overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg"></div>
+              </div>
+              <div id="pos-client-nom-wrap">
+                {{ form.client_nom }}
+              </div>
+              {% if form.client_telephone.errors %}<p class="text-xs text-red-600">{{ form.client_telephone.errors.0 }}</p>{% endif %}
+              {% if form.client_nom.errors %}<p class="text-xs text-red-600">{{ form.client_nom.errors.0 }}</p>{% endif %}
+              <p class="text-xs text-gray-400">Laissez le téléphone vide pour une vente sans client identifié.</p>
+            </div>
+          </div>
+
+          <!-- Panier -->
+          <div class="rounded-xl border border-gray-100 bg-white shadow-sm">
+            <div class="grid grid-cols-[auto_1fr_auto_auto_auto] items-center gap-2 border-b border-gray-100 px-4 py-2 text-xs font-medium uppercase tracking-wide text-gray-400">
+              <span>Qté</span>
+              <span>Article</span>
+              <span class="text-right">Prix</span>
+              <span class="text-right">Total</span>
+              <span></span>
+            </div>
+
+            <div id="pos-form-error" class="mx-4 mt-3 hidden rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700"></div>
+
+            <div id="pos-empty-state" class="px-4 py-10 text-center text-sm text-gray-400">
+              Panier vide — ajoutez des articles depuis le catalogue.
+            </div>
+            <div id="pos-selection" class="max-h-[32vh] divide-y divide-gray-50 overflow-y-auto"></div>
+
+            <!-- Remise / taxe / mode de paiement -->
+            <div class="grid grid-cols-3 gap-2 border-t border-gray-100 p-3">
+              <div>
+                <label for="{{ form.remise.id_for_label }}" class="mb-1 block text-[11px] font-medium text-gray-500">{{ form.remise.label }}</label>
+                {{ form.remise }}
+              </div>
+              <div>
+                <label for="{{ form.taxe.id_for_label }}" class="mb-1 block text-[11px] font-medium text-gray-500">{{ form.taxe.label }}</label>
+                {{ form.taxe }}
+              </div>
+              <div>
+                <label for="{{ form.mode_paiement.id_for_label }}" class="mb-1 block text-[11px] font-medium text-gray-500">{{ form.mode_paiement.label }}</label>
+                {{ form.mode_paiement }}
+              </div>
+            </div>
+
+            <!-- Totaux -->
+            <div class="space-y-1 border-t border-gray-100 px-4 py-3 text-sm">
+              <div class="flex justify-between text-gray-500">
+                <span>Sous-total</span>
+                <span id="pos-sous-total">0.00</span>
+              </div>
+              <div class="flex justify-between text-gray-500">
+                <span>Remise</span>
+                <span id="pos-remise-affichee">-0.00</span>
+              </div>
+              <div class="flex justify-between text-gray-500">
+                <span>Taxe</span>
+                <span id="pos-taxe-affichee">+0.00</span>
+              </div>
+              <div class="flex justify-between border-t border-gray-100 pt-1.5 text-base font-bold text-gray-900">
+                <span>Total</span>
+                <span id="pos-total">0.00</span>
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="grid grid-cols-2 gap-2 border-t border-gray-100 p-3">
+              <button type="button" id="pos-vider-panier"
+                class="rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-100">
+                Vider
+              </button>
+              <button type="submit"
+                class="rounded-lg bg-primary-800 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-900 focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:ring-offset-2">
+                Encaisser
+              </button>
+            </div>
+          </div>
+
+          <a href="{% url 'sales:commande_list' %}" class="block text-center text-sm font-medium text-gray-600 hover:text-gray-900">
+            Historique des ventes →
+          </a>
+        </div>
+      </div>
+    </form>
+  {% endif %}
+</div>
+
+{% if a_une_agence_disponible %}
+<script>
+(function () {
+  const PRODUIT_SEARCH_URL = "{% url 'sales:pos_produit_recherche' %}";
+  const CLIENT_SEARCH_URL = "{% url 'sales:client_recherche' %}";
+
+  const searchInput = document.getElementById("pos-search-input");
+  const searchClear = document.getElementById("pos-search-clear");
+  const categoryChips = document.querySelectorAll(".pos-category-chip");
+  const resultsCount = document.getElementById("pos-results-count");
+  const productGrid = document.getElementById("pos-product-grid");
+  const gridEmpty = document.getElementById("pos-grid-empty");
+
+  const selectionBox = document.getElementById("pos-selection");
+  const emptyState = document.getElementById("pos-empty-state");
+  const entriesInput = document.getElementById("entries-json-input");
+  const form = document.getElementById("commande-form");
+  const errorBox = document.getElementById("pos-form-error");
+  const sousTotalLabel = document.getElementById("pos-sous-total");
+  const remiseAfficheeLabel = document.getElementById("pos-remise-affichee");
+  const taxeAfficheeLabel = document.getElementById("pos-taxe-affichee");
+  const totalLabel = document.getElementById("pos-total");
+  const viderBtn = document.getElementById("pos-vider-panier");
+
+  const clientTelephoneInput = document.getElementById("{{ form.client_telephone.id_for_label }}");
+  const clientNomInput = document.getElementById("{{ form.client_nom.id_for_label }}");
+  const clientResultsBox = document.getElementById("client-search-results");
+  const clientFieldsWrap = document.getElementById("pos-client-fields");
+  const clientChip = document.getElementById("pos-client-chip");
+  const clientChipLabel = document.getElementById("pos-client-chip-label");
+  const clientChipRemove = document.getElementById("pos-client-chip-remove");
+
+  const remiseInput = document.getElementById("{{ form.remise.id_for_label }}");
+  const taxeInput = document.getElementById("{{ form.taxe.id_for_label }}");
+
+  // Champ "Agence de vente" — n'existe que pour un Admin (Caissier/Responsable
+  // vendent dans leur propre agence, imposée côté serveur, pas de champ à afficher).
+  const agenceSelect = document.getElementById("{{ form.agence.id_for_label }}");
+
+  // produit_id -> { nom, sku, prix_vente, stock_disponible, quantite }
+  let selection = {};
+  let produitDebounce = null;
+  let clientDebounce = null;
+  let activeCategorieId = "";
+
+  function escapeHtml(value) {
+    return String(value == null ? "" : value).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  function toNumber(value) {
+    const n = parseFloat(value);
+    return isNaN(n) ? 0 : n;
+  }
+
+  // --- Agence de vente (Admin uniquement) ------------------------------
+  function agenceEstChoisie() {
+    return !agenceSelect || !!agenceSelect.value;
+  }
+
+  function updateSearchAvailability() {
+    const dispo = agenceEstChoisie();
+    searchInput.disabled = !dispo;
+    searchInput.placeholder = dispo ? "Rechercher un produit (nom ou SKU)…" : "Choisissez d'abord une agence de vente…";
+    if (dispo) {
+      runProduitSearch();
+    } else {
+      productGrid.innerHTML = "";
+      gridEmpty.classList.add("hidden");
+      resultsCount.textContent = "";
+    }
+  }
+  if (agenceSelect) {
+    agenceSelect.addEventListener("change", function () {
+      selection = {};
+      renderSelection();
+      searchInput.value = "";
+      updateSearchAvailability();
+    });
+  }
+
+  // --- Filtre catégorie -------------------------------------------------
+  categoryChips.forEach(function (chip) {
+    chip.addEventListener("click", function () {
+      activeCategorieId = chip.dataset.categorieId || "";
+      categoryChips.forEach(function (c) {
+        c.classList.remove("bg-primary-800", "text-white");
+        c.classList.add("bg-gray-100", "text-gray-600");
+      });
+      chip.classList.remove("bg-gray-100", "text-gray-600");
+      chip.classList.add("bg-primary-800", "text-white");
+      runProduitSearch();
+    });
+  });
+
+  // --- Recherche / grille produits --------------------------------------
+  searchInput.addEventListener("input", function () {
+    searchClear.classList.toggle("hidden", !searchInput.value);
+    clearTimeout(produitDebounce);
+    produitDebounce = setTimeout(runProduitSearch, 300);
+  });
+  searchClear.addEventListener("click", function () {
+    searchInput.value = "";
+    searchClear.classList.add("hidden");
+    runProduitSearch();
+  });
+
+  function runProduitSearch() {
+    if (!agenceEstChoisie()) return;
+    const params = new URLSearchParams({ q: searchInput.value.trim() });
+    if (activeCategorieId) params.set("categorie_id", activeCategorieId);
+    if (agenceSelect) params.set("agence_id", agenceSelect.value);
+    fetch(PRODUIT_SEARCH_URL + "?" + params.toString(), { headers: { "X-Requested-With": "XMLHttpRequest" } })
+      .then(function (r) { return r.json(); })
+      .then(function (data) { renderProductGrid(data); })
+      .catch(function () { productGrid.innerHTML = ""; gridEmpty.classList.remove("hidden"); resultsCount.textContent = ""; });
+  }
+
+  function renderProductGrid(data) {
+    const results = data.results || [];
+    resultsCount.textContent = results.length
+      ? "Affichage de " + data.affiches + " sur " + data.total + " produit(s)"
+      : "";
+
+    if (!results.length) {
+      productGrid.innerHTML = "";
+      gridEmpty.classList.remove("hidden");
+      return;
+    }
+    gridEmpty.classList.add("hidden");
+
+    productGrid.innerHTML = results.map(function (p) {
+      const image = p.image_url
+        ? '<img src="' + escapeHtml(p.image_url) + '" alt="" class="h-12 w-12 shrink-0 rounded-lg object-cover">'
+        : '<div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-400">' +
+          '<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" /></svg></div>';
+      const categorieBadge = p.categorie
+        ? '<span class="inline-block rounded-full bg-primary-50 px-2 py-0.5 text-[11px] font-medium text-primary-700">' + escapeHtml(p.categorie) + '</span>'
+        : "";
+      return (
+        '<div class="flex items-center gap-3 rounded-lg border border-gray-100 p-2.5 hover:border-gray-200 hover:shadow-sm">' +
+        image +
+        '<div class="min-w-0 flex-1">' +
+        '<p class="truncate text-sm font-medium text-gray-900">' + escapeHtml(p.nom) + '</p>' +
+        '<div class="mt-0.5 flex flex-wrap items-center gap-1.5">' + categorieBadge +
+        '<span class="text-[11px] text-gray-400">' + escapeHtml(p.sku) + ' · stock : ' + escapeHtml(p.stock_disponible) + '</span></div>' +
+        '</div>' +
+        '<div class="shrink-0 text-right">' +
+        '<p class="text-sm font-semibold text-gray-900">' + escapeHtml(p.prix_vente) + '</p>' +
+        '</div>' +
+        '<button type="button" class="pos-add-item flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-800 text-white hover:bg-primary-900" ' +
+        'data-id="' + escapeHtml(p.produit_id) + '" data-nom="' + escapeHtml(p.nom) + '" data-sku="' + escapeHtml(p.sku) + '" ' +
+        'data-prix="' + escapeHtml(p.prix_vente) + '" data-stock="' + escapeHtml(p.stock_disponible) + '">' +
+        '<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>' +
+        '</button>' +
+        '</div>'
+      );
+    }).join("");
+
+    productGrid.querySelectorAll(".pos-add-item").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        addProduit({
+          id: btn.dataset.id,
+          nom: btn.dataset.nom,
+          sku: btn.dataset.sku,
+          prix_vente: parseFloat(btn.dataset.prix) || 0,
+          stock_disponible: parseInt(btn.dataset.stock, 10) || 0,
+        });
+      });
+    });
+  }
+
+  function addProduit(p) {
+    if (selection[p.id]) {
+      selection[p.id].quantite = (parseInt(selection[p.id].quantite, 10) || 0) + 1;
+    } else {
+      selection[p.id] = {
+        nom: p.nom,
+        sku: p.sku,
+        prix_vente: p.prix_vente,
+        stock_disponible: p.stock_disponible,
+        quantite: 1,
+      };
+    }
+    renderSelection();
+  }
+
+  function removeProduit(id) {
+    delete selection[id];
+    renderSelection();
+  }
+
+  function renderSelection() {
+    const ids = Object.keys(selection);
+    if (!ids.length) {
+      selectionBox.innerHTML = "";
+      emptyState.classList.remove("hidden");
+      updateTotals();
+      return;
+    }
+    emptyState.classList.add("hidden");
+    selectionBox.innerHTML = ids.map(function (id) {
+      const data = selection[id];
+      return (
+        '<div class="grid grid-cols-[auto_1fr_auto_auto_auto] items-center gap-2 px-4 py-2.5">' +
+        '<input type="number" min="1" max="' + escapeHtml(data.stock_disponible) + '" value="' + escapeHtml(data.quantite) + '" ' +
+        'data-role="qty" data-produit="' + id + '" ' +
+        'class="w-14 rounded-lg border border-gray-300 bg-white py-1 px-1.5 text-center text-sm focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600/30">' +
+        '<div class="min-w-0"><p class="truncate text-sm font-medium text-gray-900">' + escapeHtml(data.nom) + '</p>' +
+        '<p class="truncate text-[11px] text-gray-400">' + escapeHtml(data.sku) + '</p></div>' +
+        '<span class="text-sm text-gray-500">' + escapeHtml(data.prix_vente) + '</span>' +
+        '<span class="text-sm font-medium text-gray-900" data-role="ligne-total">' + (data.quantite * data.prix_vente).toFixed(2) + '</span>' +
+        '<button type="button" data-role="remove" data-produit="' + id + '" class="text-red-500 hover:text-red-700">' +
+        '<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>' +
+        '</button>' +
+        '</div>'
+      );
+    }).join("");
+
+    selectionBox.querySelectorAll("[data-role='qty']").forEach(function (input) {
+      input.addEventListener("input", function () {
+        selection[input.dataset.produit].quantite = input.value;
+        renderSelection();
+      });
+    });
+    selectionBox.querySelectorAll("[data-role='remove']").forEach(function (btn) {
+      btn.addEventListener("click", function () { removeProduit(btn.dataset.produit); });
+    });
+
+    updateTotals();
+  }
+
+  function updateTotals() {
+    let sousTotal = 0;
+    Object.keys(selection).forEach(function (id) {
+      const data = selection[id];
+      sousTotal += (parseFloat(data.quantite) || 0) * (parseFloat(data.prix_vente) || 0);
+    });
+    sousTotalLabel.textContent = sousTotal.toFixed(2);
+
+    const remise = toNumber(remiseInput.value);
+    const taxe = toNumber(taxeInput.value);
+    remiseAfficheeLabel.textContent = "-" + remise.toFixed(2);
+    taxeAfficheeLabel.textContent = "+" + taxe.toFixed(2);
+    const total = Math.max(0, sousTotal - remise + taxe);
+    totalLabel.textContent = total.toFixed(2);
+  }
+  remiseInput.addEventListener("input", updateTotals);
+  taxeInput.addEventListener("input", updateTotals);
+
+  viderBtn.addEventListener("click", function () {
+    if (!Object.keys(selection).length) return;
+    if (!confirm("Vider le panier en cours ?")) return;
+    selection = {};
+    renderSelection();
+  });
+
+  // --- Recherche client -------------------------------------------------
+  function showClientChip(nom, telephone) {
+    clientChipLabel.textContent = nom + " · " + telephone;
+    clientChip.classList.remove("hidden");
+    clientFieldsWrap.classList.add("hidden");
+  }
+  function hideClientChip() {
+    clientChip.classList.add("hidden");
+    clientFieldsWrap.classList.remove("hidden");
+  }
+
+  clientTelephoneInput.addEventListener("input", function () {
+    clearTimeout(clientDebounce);
+    const q = clientTelephoneInput.value.trim();
+    if (q.length < 2) {
+      clientResultsBox.classList.add("hidden");
+      clientResultsBox.innerHTML = "";
+      return;
+    }
+    clientDebounce = setTimeout(function () { runClientSearch(q); }, 300);
+  });
+
+  function runClientSearch(q) {
+    const params = new URLSearchParams({ q: q });
+    fetch(CLIENT_SEARCH_URL + "?" + params.toString(), { headers: { "X-Requested-With": "XMLHttpRequest" } })
+      .then(function (r) { return r.json(); })
+      .then(function (data) { renderClientResults(data.results || []); })
+      .catch(function () { clientResultsBox.classList.add("hidden"); });
+  }
+
+  function renderClientResults(results) {
+    if (!results.length) {
+      clientResultsBox.classList.add("hidden");
+      clientResultsBox.innerHTML = "";
+      return;
+    }
+    clientResultsBox.innerHTML = results.map(function (c) {
+      return (
+        '<button type="button" class="client-result-item flex w-full items-center justify-between px-3 py-2 text-left text-xs hover:bg-gray-50" ' +
+        'data-nom="' + escapeHtml(c.nom) + '" data-telephone="' + escapeHtml(c.telephone) + '">' +
+        '<span class="font-medium text-gray-900">' + escapeHtml(c.nom) + '</span>' +
+        '<span class="text-gray-400">' + escapeHtml(c.telephone) + '</span>' +
+        '</button>'
+      );
+    }).join("");
+    clientResultsBox.classList.remove("hidden");
+    clientResultsBox.querySelectorAll(".client-result-item").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        clientTelephoneInput.value = btn.dataset.telephone;
+        clientNomInput.value = btn.dataset.nom;
+        clientResultsBox.classList.add("hidden");
+        clientResultsBox.innerHTML = "";
+        showClientChip(btn.dataset.nom, btn.dataset.telephone);
+      });
+    });
+  }
+
+  clientChipRemove.addEventListener("click", function () {
+    clientTelephoneInput.value = "";
+    clientNomInput.value = "";
+    hideClientChip();
+  });
+
+  document.addEventListener("click", function (event) {
+    if (!clientResultsBox.contains(event.target) && event.target !== clientTelephoneInput) {
+      clientResultsBox.classList.add("hidden");
+    }
+  });
+
+  // --- Soumission ---------------------------------------------------
+  form.addEventListener("submit", function (event) {
+    const entries = [];
+    Object.keys(selection).forEach(function (produitId) {
+      const data = selection[produitId];
+      if (!data.quantite) return;
+      entries.push({ produit_id: produitId, quantite: data.quantite });
+    });
+
+    if (!entries.length) {
+      event.preventDefault();
+      errorBox.textContent = "Ajoutez au moins un article au panier.";
+      errorBox.classList.remove("hidden");
+      return;
+    }
+    errorBox.classList.add("hidden");
+    entriesInput.value = JSON.stringify(entries);
+  });
+
+  clientTelephoneInput.setAttribute("placeholder", "Téléphone du client (optionnel)");
+  clientNomInput.setAttribute("placeholder", "Nom du client");
+  updateSearchAvailability();
+  updateTotals();
+})();
+</script>
+{% endif %}
+{% endblock %}

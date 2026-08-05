@@ -1,0 +1,136 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Détail de la vente{% endblock %}
+{% block page_title %}Détail de la vente{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-3xl space-y-6">
+
+  {% if messages %}
+    <div class="space-y-2">
+      {% for message in messages %}
+        <div class="rounded-lg border px-4 py-2.5 text-sm
+          {% if message.tags == 'success' %}border-green-200 bg-green-50 text-green-800
+          {% elif message.tags == 'warning' %}border-amber-200 bg-amber-50 text-amber-800
+          {% elif message.tags == 'error' %}border-red-200 bg-red-50 text-red-700
+          {% else %}border-blue-200 bg-blue-50 text-blue-800{% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <div class="flex items-center justify-between">
+    <div>
+      <h2 class="text-lg font-semibold text-gray-900">Vente #{{ commande.id|stringformat:"s"|slice:":8" }}</h2>
+      <p class="mt-1 text-sm text-gray-500">{{ commande.date|date:"d/m/Y H:i" }}</p>
+    </div>
+    <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium
+      {% if commande.statut == 'TERMINEE' %}bg-green-100 text-green-800
+      {% elif commande.statut == 'ANNULEE' %}bg-red-100 text-red-800
+      {% elif commande.statut == 'REMBOURSEE' %}bg-blue-100 text-blue-800
+      {% else %}bg-amber-100 text-amber-800{% endif %}">
+      {{ commande.get_statut_display }}
+    </span>
+  </div>
+
+  <!-- Infos générales -->
+  <div class="grid grid-cols-1 gap-4 rounded-xl border border-gray-100 bg-white p-6 shadow-sm sm:grid-cols-2">
+    <div>
+      <p class="text-xs font-medium uppercase tracking-wide text-gray-400">Agence</p>
+      <p class="mt-1 text-sm text-gray-900">{{ commande.agence.nom }}</p>
+    </div>
+    <div>
+      <p class="text-xs font-medium uppercase tracking-wide text-gray-400">Caissier</p>
+      <p class="mt-1 text-sm text-gray-900">{{ commande.caissier.get_full_name|default:commande.caissier.username }}</p>
+    </div>
+    <div>
+      <p class="text-xs font-medium uppercase tracking-wide text-gray-400">Client</p>
+      <p class="mt-1 text-sm text-gray-900">
+        {% if commande.client %}
+          {{ commande.client.nom }} · {{ commande.client.telephone }}
+        {% else %}
+          Client de passage
+        {% endif %}
+      </p>
+    </div>
+    <div>
+      <p class="text-xs font-medium uppercase tracking-wide text-gray-400">Mode de paiement</p>
+      <p class="mt-1 text-sm text-gray-900">{{ commande.get_mode_paiement_display }}</p>
+    </div>
+  </div>
+
+  <!-- Articles -->
+  <div class="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
+    <div class="border-b border-gray-100 px-4 py-3 sm:px-6">
+      <h3 class="text-sm font-semibold text-gray-900">Articles</h3>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full min-w-[520px] text-left text-sm">
+        <thead class="border-b border-gray-100 bg-gray-50">
+          <tr>
+            <th scope="col" class="px-4 py-3 font-medium text-gray-500">Produit</th>
+            <th scope="col" class="px-4 py-3 text-right font-medium text-gray-500">Quantité</th>
+            <th scope="col" class="px-4 py-3 text-right font-medium text-gray-500">Prix unitaire</th>
+            <th scope="col" class="px-4 py-3 text-right font-medium text-gray-500">Sous-total</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          {% for ligne in commande.lignes.all %}
+            <tr>
+              <td class="px-4 py-3 font-medium text-gray-900">{{ ligne.produit.nom }}</td>
+              <td class="px-4 py-3 text-right text-gray-500">{{ ligne.quantite }}</td>
+              <td class="px-4 py-3 text-right text-gray-500">{{ ligne.prix_unitaire }}</td>
+              <td class="px-4 py-3 text-right text-gray-900">{{ ligne.sous_total }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="space-y-1.5 border-t border-gray-100 px-4 py-4 text-sm sm:px-6">
+      <div class="flex justify-end gap-8">
+        <span class="text-gray-500">Remise</span>
+        <span class="w-24 text-right text-gray-900">-{{ commande.remise }}</span>
+      </div>
+      <div class="flex justify-end gap-8">
+        <span class="text-gray-500">Taxe</span>
+        <span class="w-24 text-right text-gray-900">+{{ commande.taxe }}</span>
+      </div>
+      <div class="flex justify-end gap-8 text-base font-semibold">
+        <span class="text-gray-900">Total</span>
+        <span class="w-24 text-right text-gray-900">{{ commande.total }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  {% if peut_gerer and commande.statut == 'TERMINEE' %}
+    <div class="flex items-center gap-3 rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
+      <span class="text-sm text-gray-500">Annuler ou rembourser cette vente recrédite le stock vendu.</span>
+      <div class="ml-auto flex gap-2">
+        <form method="post" action="{% url 'sales:commande_statut_update' commande.pk %}"
+          onsubmit="return confirm('Confirmer le remboursement de cette vente ? Le stock vendu sera recrédité.');">
+          {% csrf_token %}
+          <input type="hidden" name="statut" value="REMBOURSEE">
+          <button type="submit" class="rounded-lg border border-blue-200 bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-700 hover:bg-blue-100">
+            Rembourser
+          </button>
+        </form>
+        <form method="post" action="{% url 'sales:commande_statut_update' commande.pk %}"
+          onsubmit="return confirm('Confirmer l\'annulation de cette vente ? Le stock vendu sera recrédité.');">
+          {% csrf_token %}
+          <input type="hidden" name="statut" value="ANNULEE">
+          <button type="submit" class="rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-sm font-medium text-red-700 hover:bg-red-100">
+            Annuler la vente
+          </button>
+        </form>
+      </div>
+    </div>
+  {% endif %}
+
+  <a href="{% url 'sales:commande_list' %}" class="inline-block text-sm font-medium text-gray-600 hover:text-gray-900">
+    ← Retour à l'historique
+  </a>
+</div>
+{% endblock %}

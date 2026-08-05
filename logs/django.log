@@ -162,3 +162,76 @@ django.template.exceptions.TemplateDoesNotExist: general/agence_form.html
 2026-08-04 01:50:33,541 [INFO] django.utils.autoreload - Watching for file changes with StatReloader
 2026-08-04 01:51:15,088 [INFO] django.utils.autoreload - C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\products\views\transfer_views.py changed, reloading.
 2026-08-04 01:51:44,577 [INFO] django.utils.autoreload - Watching for file changes with StatReloader
+2026-08-05 01:30:46,710 [INFO] django.utils.autoreload - C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\sales\urls.py changed, reloading.
+2026-08-05 01:31:18,883 [INFO] django.utils.autoreload - Watching for file changes with StatReloader
+2026-08-05 01:35:17,119 [WARNING] django.request - Not Found: /favicon.ico
+2026-08-05 01:36:00,699 [WARNING] django.request - Forbidden (Permission denied): /sales/ventes/nouvelle/
+Traceback (most recent call last):
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\views\generic\base.py", line 105, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\contrib\auth\mixins.py", line 73, in dispatch
+    return super().dispatch(request, *args, **kwargs)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\contrib\auth\mixins.py", line 134, in dispatch
+    return self.handle_no_permission()
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\contrib\auth\mixins.py", line 48, in handle_no_permission
+    raise PermissionDenied(self.get_permission_denied_message())
+django.core.exceptions.PermissionDenied
+2026-08-05 01:37:17,983 [WARNING] django.request - Forbidden (Permission denied): /sales/ventes/nouvelle/
+Traceback (most recent call last):
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\views\generic\base.py", line 105, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\contrib\auth\mixins.py", line 73, in dispatch
+    return super().dispatch(request, *args, **kwargs)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\contrib\auth\mixins.py", line 134, in dispatch
+    return self.handle_no_permission()
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\contrib\auth\mixins.py", line 48, in handle_no_permission
+    raise PermissionDenied(self.get_permission_denied_message())
+django.core.exceptions.PermissionDenied
+2026-08-05 01:37:20,030 [INFO] django.utils.autoreload - C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\sales\views\pos_views.py changed, reloading.
+2026-08-05 01:37:21,511 [WARNING] django.request - Forbidden (Permission denied): /sales/ventes/nouvelle/
+Traceback (most recent call last):
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\views\generic\base.py", line 105, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\contrib\auth\mixins.py", line 73, in dispatch
+    return super().dispatch(request, *args, **kwargs)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\contrib\auth\mixins.py", line 134, in dispatch
+    return self.handle_no_permission()
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\contrib\auth\mixins.py", line 48, in handle_no_permission
+    raise PermissionDenied(self.get_permission_denied_message())
+django.core.exceptions.PermissionDenied
+2026-08-05 01:37:54,860 [INFO] django.utils.autoreload - Watching for file changes with StatReloader
+2026-08-05 01:38:12,848 [INFO] django.utils.autoreload - C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\sales\views\pos_views.py changed, reloading.
+2026-08-05 01:38:29,313 [INFO] django.utils.autoreload - Watching for file changes with StatReloader
+2026-08-05 01:38:35,383 [WARNING] django.request - Forbidden (Permission denied): /sales/ventes/nouvelle/
+Traceback (most recent call last):
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\views\generic\base.py", line 105, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\contrib\auth\mixins.py", line 73, in dispatch
+    return super().dispatch(request, *args, **kwargs)
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\contrib\auth\mixins.py", line 134, in dispatch
+    return self.handle_no_permission()
+  File "C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\venv\lib\site-packages\django\contrib\auth\mixins.py", line 48, in handle_no_permission
+    raise PermissionDenied(self.get_permission_denied_message())
+django.core.exceptions.PermissionDenied
+2026-08-05 01:38:54,982 [INFO] django.utils.autoreload - C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\sales\views\pos_views.py changed, reloading.
+2026-08-05 01:39:11,561 [INFO] django.utils.autoreload - Watching for file changes with StatReloader
+2026-08-05 01:48:53,250 [INFO] django.utils.autoreload - C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\sales\forms.py changed, reloading.
+2026-08-05 01:49:25,010 [INFO] django.utils.autoreload - Watching for file changes with StatReloader
+2026-08-05 02:04:21,785 [INFO] django.utils.autoreload - C:\Users\Fotsingboris\Videos\YOUTUBE\MA_SYS\sales\views\pos_views.py changed, reloading.
+2026-08-05 02:05:12,439 [INFO] django.utils.autoreload - Watching for file changes with StatReloader
